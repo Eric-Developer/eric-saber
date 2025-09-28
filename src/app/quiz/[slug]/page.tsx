@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, use } from "react";
 import dataJson from "@/app/data/questions.json";
+import Link from "next/link";
 
 interface Pergunta {
   id: string;
@@ -133,14 +134,14 @@ const normalizedSlug = normalize(slug);
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-6">
         <header className="w-full max-w-4xl flex items-center justify-between bg-gray-800 text-white px-6 py-4 rounded-2xl shadow-2xl mb-12">
-         <a href="/">
+         <Link href="/">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold">
               ES
             </div>
             <div className="font-semibold text-lg">EricSaber</div>
           </div>
-        </a>
+        </Link>
         </header>
 
         <h1 className="text-4xl font-bold mb-6">{quiz.titulo.toUpperCase()} - Resultado</h1>
@@ -170,7 +171,6 @@ const normalizedSlug = normalize(slug);
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
-
         <header className="w-full flex items-center justify-between bg-gray-800 text-white px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold">ES</div>

@@ -2,8 +2,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import dataJson from "@/app/data/questions.json";
-
-// Interfaces para tipagem
+import Link from "next/link";
 interface Pergunta {
   id: string;
   texto: string;
@@ -38,7 +37,7 @@ export default function HomePage() {
   const handleGenerateQuiz = () => {
     if (!pesquisa) return;
 
-    setLoading(true); // ativa carregando
+    setLoading(true); 
 
     const slug = normalize(pesquisa);
     const quizzes: Quiz[] = dataJson as Quiz[];
@@ -60,14 +59,14 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center px-4">
       <header className="w-full max-w-4xl flex items-center justify-between bg-gray-800 text-white px-6 py-4 rounded-2xl shadow-2xl mb-12">
-        <a href="/">
+        <Link href="/">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold">
               ES
             </div>
             <div className="font-semibold text-lg">EricSaber</div>
           </div>
-        </a>
+        </Link>
       </header>
 
       <main className="flex flex-col items-center gap-6 w-full max-w-md">
