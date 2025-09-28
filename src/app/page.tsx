@@ -3,12 +3,30 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import dataJson from "@/app/data/questions.json";
 
+// Interfaces para tipagem
+interface Pergunta {
+  id: string;
+  texto: string;
+  alternativas: string[];
+  correta: number;
+  tags: string[];
+}
+
+interface Quiz {
+  id: number;
+  titulo: string;
+  tema: string;
+  materia: string;
+  anoEstudo: string;
+  tags: string[];
+  perguntas: Pergunta[];
+}
+
 function normalize(str: string) {
   return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 function similarity(a: string, b: string) {
-  // simples comparação de substrings
   return normalize(a).includes(normalize(b));
 }
 
@@ -19,10 +37,13 @@ export default function HomePage() {
   const handleGenerateQuiz = () => {
     if (!pesquisa) return;
 
-    // busca fuzzy na lista de quizzes
     const slug = normalize(pesquisa);
-    const quizEncontrado = (dataJson as any[]).find((q) =>
-      q.tags.some((tag: string) => similarity(tag, slug))
+
+    // tipa o dataJson como um array de Quiz
+    const quizzes: Quiz[] = dataJson as Quiz[];
+
+    const quizEncontrado = quizzes.find((q) =>
+      q.tags.some((tag) => similarity(tag, slug))
     );
 
     if (quizEncontrado) {
