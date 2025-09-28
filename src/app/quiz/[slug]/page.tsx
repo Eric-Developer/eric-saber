@@ -21,10 +21,9 @@ interface Quiz {
 }
 
 interface QuizPageProps {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }
 
-// Normaliza strings
 function normalize(str: string) {
   return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
@@ -33,29 +32,25 @@ function normalizeArray(arr: string[]) {
   return arr.map(normalize);
 }
 
-// Tempo de expiração em ms (20 minutos)
-const EXPIRATION_TIME = 20 * 60 * 1000;
+const EXPIRATION_TIME = 20 * 60 * 1000; // 20 minutos
 
 export default function QuizPage({ params }: QuizPageProps) {
-  const resolvedParams = React.use(params);
-  const slug = normalize(resolvedParams.slug);
+  const slug = normalize(params.slug);
 
-  // Seleciona o quiz correto
   const quiz: Quiz | undefined = (dataJson as Quiz[]).find((q) =>
     normalizeArray(q.tags).includes(slug)
   );
 
   const filteredQuestions = quiz ? quiz.perguntas : [];
 
-  // Estados do quiz
   const [perguntas, setPerguntas] = useState<Pergunta[]>([]);
   const [perguntaAtual, setPerguntaAtual] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [acertos, setAcertos] = useState(0);
   const [erros, setErros] = useState(0);
+  const [temaAtual, setTemaAtual] = useState<string>(""); // <- armazena a tag/assunto
 
-  // Carrega perguntas e resultados do localStorage
   useEffect(() => {
     if (!quiz) return;
 
@@ -67,6 +62,7 @@ export default function QuizPage({ params }: QuizPageProps) {
       erros: 0,
       selected: null,
       showFeedback: false,
+      temaAtual: slug, // <- salva a tag inicial
       timestamp: Date.now(),
     };
 
@@ -84,9 +80,9 @@ export default function QuizPage({ params }: QuizPageProps) {
     setErros(initialState.erros);
     setSelected(initialState.selected);
     setShowFeedback(initialState.showFeedback);
+    setTemaAtual(initialState.temaAtual || slug); // <- recupera a tag
   }, [slug, quiz]);
 
-  // Salva o estado no localStorage sempre que mudar
   useEffect(() => {
     if (!quiz || perguntas.length === 0) return;
     localStorage.setItem(
@@ -98,10 +94,11 @@ export default function QuizPage({ params }: QuizPageProps) {
         erros,
         selected,
         showFeedback,
+        temaAtual, // <- salva também a tag/assunto
         timestamp: Date.now(),
       })
     );
-  }, [slug, perguntas, perguntaAtual, acertos, erros, selected, showFeedback, quiz]);
+  }, [slug, perguntas, perguntaAtual, acertos, erros, selected, showFeedback, temaAtual, quiz]);
 
   const handleSelect = (idx: number) => {
     if (selected !== null || !perguntas[perguntaAtual]) return;
@@ -127,16 +124,24 @@ export default function QuizPage({ params }: QuizPageProps) {
   if (!quiz || perguntas.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-800">
-<div>Nenhuma pergunta encontrada para &quot;{slug}&quot;</div>
+        <div>Nenhuma pergunta encontrada para &quot;{slug}&quot;</div>
       </div>
     );
   }
 
-  // Resultado final
   if (isLastQuestion && selected !== null && showFeedback) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-6">
+        {/* Header */}
+        <header className="w-full max-w-4xl flex items-center justify-between bg-gray-800 text-white px-6 py-4 rounded-2xl shadow-2xl mb-12">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold">ES</div>
+            <div className="font-semibold text-lg">EricSaber</div>
+          </div>
+        </header>
+
         <h1 className="text-4xl font-bold mb-6">{quiz.titulo.toUpperCase()} - Resultado</h1>
+        <p className="text-xl mb-2">Assunto: {temaAtual}</p> {/* <- mostra a tag/assunto */}
         <p className="text-2xl mb-2">Acertos: {acertos}</p>
         <p className="text-2xl mb-2">Erros: {erros}</p>
         <p className="text-2xl mb-6">Pontuação: {acertos} / {perguntas.length}</p>
@@ -162,13 +167,21 @@ export default function QuizPage({ params }: QuizPageProps) {
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
-        {/* Top bar */}
-        <header className="bg-gray-800 text-white px-6 py-4 flex items-center justify-between">
-          <div className="font-semibold text-lg">{quiz.titulo.toUpperCase()}</div>
+        {/* Header */}
+        <header className="w-full flex items-center justify-between bg-gray-800 text-white px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold">ES</div>
+            <div className="font-semibold text-lg">EricSaber</div>
+          </div>
           <div className="text-sm">
             Pergunta {perguntaAtual + 1} de {perguntas.length}
           </div>
         </header>
+
+        {/* Título do quiz / assunto */}
+        <div className="w-full bg-gray-100 px-6 py-2 border-b text-gray-800 font-semibold">
+          {quiz.titulo} {quiz.tema && `- ${quiz.tema}`} (Assunto: {temaAtual})
+        </div>
 
         {currentQuestion && (
           <main className="px-10 py-12">
@@ -219,7 +232,6 @@ export default function QuizPage({ params }: QuizPageProps) {
               </div>
             )}
 
-            {/* Progress bar */}
             <div className="max-w-3xl mx-auto mt-8">
               <div className="flex items-center justify-between text-sm text-gray-600">
                 <div>Progresso</div>
@@ -233,7 +245,6 @@ export default function QuizPage({ params }: QuizPageProps) {
               </div>
             </div>
 
-            {/* Próxima pergunta */}
             <div className="max-w-3xl mx-auto mt-8 flex gap-4 items-center justify-center">
               {!isLastQuestion && showFeedback && (
                 <button
