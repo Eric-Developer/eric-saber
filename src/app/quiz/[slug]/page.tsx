@@ -1,0 +1,252 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import dataJson from "@/app/data/questions.json";
+
+interface Pergunta {
+  id: string;
+  texto: string;
+  alternativas: string[];
+  correta: number;
+  tags: string[];
+}
+
+interface Quiz {
+  id: number;
+  titulo: string;
+  tema: string;
+  materia: string;
+  anoEstudo: string;
+  tags: string[];
+  perguntas: Pergunta[];
+}
+
+interface QuizPageProps {
+  params: Promise<{ slug: string }>;
+}
+
+// Normaliza strings
+function normalize(str: string) {
+  return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function normalizeArray(arr: string[]) {
+  return arr.map(normalize);
+}
+
+// Tempo de expiração em ms (20 minutos)
+const EXPIRATION_TIME = 20 * 60 * 1000;
+
+export default function QuizPage({ params }: QuizPageProps) {
+  const resolvedParams = React.use(params);
+  const slug = normalize(resolvedParams.slug);
+
+  // Seleciona o quiz correto
+  const quiz: Quiz | undefined = (dataJson as Quiz[]).find((q) =>
+    normalizeArray(q.tags).includes(slug)
+  );
+
+  const filteredQuestions = quiz ? quiz.perguntas : [];
+
+  // Estados do quiz
+  const [perguntas, setPerguntas] = useState<Pergunta[]>([]);
+  const [perguntaAtual, setPerguntaAtual] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [acertos, setAcertos] = useState(0);
+  const [erros, setErros] = useState(0);
+
+  // Carrega perguntas e resultados do localStorage
+  useEffect(() => {
+    if (!quiz) return;
+
+    const storedRaw = localStorage.getItem(`quiz-${slug}`);
+    let initialState = {
+      perguntas: filteredQuestions.sort(() => Math.random() - 0.5).slice(0, 10),
+      perguntaAtual: 0,
+      acertos: 0,
+      erros: 0,
+      selected: null,
+      showFeedback: false,
+      timestamp: Date.now(),
+    };
+
+    if (storedRaw) {
+      const stored = JSON.parse(storedRaw);
+      const expired = Date.now() - stored.timestamp > EXPIRATION_TIME;
+      if (!expired && stored.perguntas?.length) {
+        initialState = stored;
+      }
+    }
+
+    setPerguntas(initialState.perguntas);
+    setPerguntaAtual(initialState.perguntaAtual);
+    setAcertos(initialState.acertos);
+    setErros(initialState.erros);
+    setSelected(initialState.selected);
+    setShowFeedback(initialState.showFeedback);
+  }, [slug, quiz]);
+
+  // Salva o estado no localStorage sempre que mudar
+  useEffect(() => {
+    if (!quiz || perguntas.length === 0) return;
+    localStorage.setItem(
+      `quiz-${slug}`,
+      JSON.stringify({
+        perguntas,
+        perguntaAtual,
+        acertos,
+        erros,
+        selected,
+        showFeedback,
+        timestamp: Date.now(),
+      })
+    );
+  }, [slug, perguntas, perguntaAtual, acertos, erros, selected, showFeedback, quiz]);
+
+  const handleSelect = (idx: number) => {
+    if (selected !== null || !perguntas[perguntaAtual]) return;
+
+    setSelected(idx);
+    setShowFeedback(true);
+
+    const isCorrect = idx === perguntas[perguntaAtual].correta;
+    if (isCorrect) setAcertos((prev) => prev + 1);
+    else setErros((prev) => prev + 1);
+  };
+
+  const handleNext = () => {
+    setSelected(null);
+    setShowFeedback(false);
+    setPerguntaAtual((prev) => prev + 1);
+  };
+
+  const currentQuestion = perguntas[perguntaAtual];
+  const isCorrect = selected === currentQuestion?.correta;
+  const isLastQuestion = perguntaAtual === perguntas.length - 1;
+
+  if (!quiz || perguntas.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-800">
+<div>Nenhuma pergunta encontrada para &quot;{slug}&quot;</div>
+      </div>
+    );
+  }
+
+  // Resultado final
+  if (isLastQuestion && selected !== null && showFeedback) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-6">
+        <h1 className="text-4xl font-bold mb-6">{quiz.titulo.toUpperCase()} - Resultado</h1>
+        <p className="text-2xl mb-2">Acertos: {acertos}</p>
+        <p className="text-2xl mb-2">Erros: {erros}</p>
+        <p className="text-2xl mb-6">Pontuação: {acertos} / {perguntas.length}</p>
+        <button
+          className="px-6 py-3 bg-green-500 rounded-full hover:bg-green-600"
+          onClick={() => {
+            localStorage.removeItem(`quiz-${slug}`);
+            const shuffled = filteredQuestions.sort(() => Math.random() - 0.5).slice(0, 10);
+            setPerguntas(shuffled);
+            setPerguntaAtual(0);
+            setSelected(null);
+            setShowFeedback(false);
+            setAcertos(0);
+            setErros(0);
+          }}
+        >
+          Reiniciar Quiz
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6">
+      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+        {/* Top bar */}
+        <header className="bg-gray-800 text-white px-6 py-4 flex items-center justify-between">
+          <div className="font-semibold text-lg">{quiz.titulo.toUpperCase()}</div>
+          <div className="text-sm">
+            Pergunta {perguntaAtual + 1} de {perguntas.length}
+          </div>
+        </header>
+
+        {currentQuestion && (
+          <main className="px-10 py-12">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-center text-gray-800">
+              {perguntaAtual + 1}. {currentQuestion.texto}
+            </h1>
+
+            <div className="mt-10 space-y-4 max-w-3xl mx-auto">
+              {currentQuestion.alternativas.map((alt, idx) => {
+                const selectedClass =
+                  selected === idx
+                    ? "ring-2 ring-offset-2 ring-gray-400"
+                    : "hover:ring-2 hover:ring-offset-2 hover:ring-gray-200";
+                const feedbackClass = showFeedback
+                  ? idx === currentQuestion.correta
+                    ? "bg-green-50 border-green-400"
+                    : selected === idx
+                    ? "bg-red-50 border-red-300"
+                    : "bg-white"
+                  : "bg-white";
+
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleSelect(idx)}
+                    className={`w-full text-left flex items-center gap-4 px-5 py-4 border rounded-full shadow-sm transition ${selectedClass} ${feedbackClass}`}
+                  >
+                    <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center font-medium">
+                      {String.fromCharCode(65 + idx)}
+                    </div>
+                    <div className="flex-1 text-gray-800">{alt}</div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {showFeedback && selected !== null && (
+              <div className="max-w-3xl mx-auto mt-6">
+                {isCorrect ? (
+                  <div className="rounded-md p-3 bg-green-50 border border-green-200 text-green-800">
+                    Resposta correta ✓
+                  </div>
+                ) : (
+                  <div className="rounded-md p-3 bg-red-50 border border-red-200 text-red-800">
+                    Resposta incorreta ✕
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Progress bar */}
+            <div className="max-w-3xl mx-auto mt-8">
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <div>Progresso</div>
+                <div>{Math.round(((perguntaAtual + 1) / perguntas.length) * 100)}%</div>
+              </div>
+              <div className="w-full bg-gray-200 h-3 rounded-full mt-2">
+                <div
+                  className="h-3 rounded-full bg-gray-800"
+                  style={{ width: `${((perguntaAtual + 1) / perguntas.length) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Próxima pergunta */}
+            <div className="max-w-3xl mx-auto mt-8 flex gap-4 items-center justify-center">
+              {!isLastQuestion && showFeedback && (
+                <button
+                  onClick={handleNext}
+                  className="px-6 py-3 bg-gray-800 text-white rounded-full shadow disabled:opacity-50"
+                >
+                  Próxima Pergunta
+                </button>
+              )}
+            </div>
+          </main>
+        )}
+      </div>
+    </div>
+  );
+}
