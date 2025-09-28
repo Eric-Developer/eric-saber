@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import dataJson from "@/app/data/questions.json";
 
 interface Pergunta {
@@ -34,9 +34,9 @@ function normalizeArray(arr: string[]) {
 
 const EXPIRATION_TIME = 20 * 60 * 1000; // 20 minutos
 
-export default function QuizPage({ params }: QuizPageProps) {
-  const slug = normalize(params.slug);
-
+export default function QuizPage({ params }: { params: Promise<{ slug: string }> }) {
+const { slug } = use(params); // unwrap da Promise
+const normalizedSlug = normalize(slug);
   const quiz: Quiz | undefined = (dataJson as Quiz[]).find((q) =>
     normalizeArray(q.tags).includes(slug)
   );
@@ -49,7 +49,7 @@ export default function QuizPage({ params }: QuizPageProps) {
   const [showFeedback, setShowFeedback] = useState(false);
   const [acertos, setAcertos] = useState(0);
   const [erros, setErros] = useState(0);
-  const [temaAtual, setTemaAtual] = useState<string>(""); // <- armazena a tag/assunto
+  const [temaAtual, setTemaAtual] = useState<string>(""); 
 
   useEffect(() => {
     if (!quiz) return;
@@ -62,7 +62,7 @@ export default function QuizPage({ params }: QuizPageProps) {
       erros: 0,
       selected: null,
       showFeedback: false,
-      temaAtual: slug, // <- salva a tag inicial
+      temaAtual: slug, 
       timestamp: Date.now(),
     };
 
@@ -80,7 +80,7 @@ export default function QuizPage({ params }: QuizPageProps) {
     setErros(initialState.erros);
     setSelected(initialState.selected);
     setShowFeedback(initialState.showFeedback);
-    setTemaAtual(initialState.temaAtual || slug); // <- recupera a tag
+    setTemaAtual(initialState.temaAtual || slug); 
   }, [slug, quiz]);
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function QuizPage({ params }: QuizPageProps) {
         erros,
         selected,
         showFeedback,
-        temaAtual, // <- salva também a tag/assunto
+        temaAtual, 
         timestamp: Date.now(),
       })
     );
@@ -132,16 +132,19 @@ export default function QuizPage({ params }: QuizPageProps) {
   if (isLastQuestion && selected !== null && showFeedback) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-6">
-        {/* Header */}
         <header className="w-full max-w-4xl flex items-center justify-between bg-gray-800 text-white px-6 py-4 rounded-2xl shadow-2xl mb-12">
+         <a href="/">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold">ES</div>
+            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold">
+              ES
+            </div>
             <div className="font-semibold text-lg">EricSaber</div>
           </div>
+        </a>
         </header>
 
         <h1 className="text-4xl font-bold mb-6">{quiz.titulo.toUpperCase()} - Resultado</h1>
-        <p className="text-xl mb-2">Assunto: {temaAtual}</p> {/* <- mostra a tag/assunto */}
+        <p className="text-xl mb-2">Assunto: {temaAtual}</p> 
         <p className="text-2xl mb-2">Acertos: {acertos}</p>
         <p className="text-2xl mb-2">Erros: {erros}</p>
         <p className="text-2xl mb-6">Pontuação: {acertos} / {perguntas.length}</p>
@@ -167,7 +170,7 @@ export default function QuizPage({ params }: QuizPageProps) {
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
-        {/* Header */}
+
         <header className="w-full flex items-center justify-between bg-gray-800 text-white px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold">ES</div>
@@ -178,14 +181,13 @@ export default function QuizPage({ params }: QuizPageProps) {
           </div>
         </header>
 
-        {/* Título do quiz / assunto */}
         <div className="w-full bg-gray-100 px-6 py-2 border-b text-gray-800 font-semibold">
           {quiz.titulo} {quiz.tema && `- ${quiz.tema}`} (Assunto: {temaAtual})
         </div>
 
         {currentQuestion && (
           <main className="px-10 py-12">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-center text-gray-800">
+            <h1 className="text-2xl md:text-4xl font-extrabold text-center text-gray-800">
               {perguntaAtual + 1}. {currentQuestion.texto}
             </h1>
 
@@ -209,7 +211,7 @@ export default function QuizPage({ params }: QuizPageProps) {
                     onClick={() => handleSelect(idx)}
                     className={`w-full text-left flex items-center gap-4 px-5 py-4 border rounded-full shadow-sm transition ${selectedClass} ${feedbackClass}`}
                   >
-                    <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center font-medium">
+                    <div className="w-12 h-12 sm:w-9 sm:h-9 rounded-full bg-gray-800 flex items-center justify-center text-white font-bold text-lg sm:text-base">
                       {String.fromCharCode(65 + idx)}
                     </div>
                     <div className="flex-1 text-gray-800">{alt}</div>

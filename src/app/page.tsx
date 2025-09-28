@@ -32,14 +32,15 @@ function similarity(a: string, b: string) {
 
 export default function HomePage() {
   const [pesquisa, setPesquisa] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleGenerateQuiz = () => {
     if (!pesquisa) return;
 
-    const slug = normalize(pesquisa);
+    setLoading(true); // ativa carregando
 
-    // tipa o dataJson como um array de Quiz
+    const slug = normalize(pesquisa);
     const quizzes: Quiz[] = dataJson as Quiz[];
 
     const quizEncontrado = quizzes.find((q) =>
@@ -47,8 +48,11 @@ export default function HomePage() {
     );
 
     if (quizEncontrado) {
-      router.push(`/quiz/${quizEncontrado.tags[0].toLowerCase()}`);
+      setTimeout(() => {
+        router.push(`/quiz/${quizEncontrado.tags[0].toLowerCase()}`);
+      }, 1200); // pequeno delay para mostrar o "gerando..."
     } else {
+      setLoading(false);
       alert("Nenhum quiz encontrado para essa tag!");
     }
   };
@@ -56,12 +60,14 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center px-4">
       <header className="w-full max-w-4xl flex items-center justify-between bg-gray-800 text-white px-6 py-4 rounded-2xl shadow-2xl mb-12">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold">
-            ES
+        <a href="/">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold">
+              ES
+            </div>
+            <div className="font-semibold text-lg">EricSaber</div>
           </div>
-          <div className="font-semibold text-lg">EricSaber</div>
-        </div>
+        </a>
       </header>
 
       <main className="flex flex-col items-center gap-6 w-full max-w-md">
@@ -82,9 +88,14 @@ export default function HomePage() {
 
         <button
           onClick={handleGenerateQuiz}
-          className="mt-4 px-8 py-4 bg-green-500 hover:bg-green-600 text-white text-xl font-semibold rounded-full shadow-lg transition"
+          disabled={loading}
+          className={`mt-4 px-8 py-4 rounded-full text-xl font-semibold shadow-lg transition ${
+            loading
+              ? "bg-gray-500 text-gray-200 cursor-not-allowed"
+              : "bg-green-500 hover:bg-green-600 text-white"
+          }`}
         >
-          Gerar Quiz
+          {loading ? "Gerando quiz..." : "Gerar Quiz"}
         </button>
       </main>
     </div>
