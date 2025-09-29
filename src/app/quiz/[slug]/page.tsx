@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, use } from "react";
 import dataJson from "@/app/data/questions.json";
+import mateamtica from "@/app/data/matematica.json";
 import Link from "next/link";
 
 interface Pergunta {
@@ -36,10 +37,15 @@ function normalizeArray(arr: string[]) {
 const EXPIRATION_TIME = 20 * 60 * 1000; // 20 minutos
 
 export default function QuizPage({ params }: { params: Promise<{ slug: string }> }) {
-const { slug } = use(params); // unwrap da Promise
-const normalizedSlug = normalize(slug);
-  const quiz: Quiz | undefined = (dataJson as Quiz[]).find((q) =>
-    normalizeArray(q.tags).includes(slug)
+  const { slug } = use(params); // unwrap da Promise
+  const normalizedSlug = normalize(slug);
+
+  // Une os dois JSONs em um array só
+  const allQuizzes: Quiz[] = [...(dataJson as Quiz[]), ...(mateamtica as Quiz[])];
+
+  // Procura o quiz baseado no slug
+  const quiz: Quiz | undefined = allQuizzes.find((q) =>
+    normalizeArray(q.tags).includes(normalizedSlug)
   );
 
   const filteredQuestions = quiz ? quiz.perguntas : [];
