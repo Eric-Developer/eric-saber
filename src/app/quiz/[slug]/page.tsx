@@ -1,179 +1,286 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
+import { supabase } from "@/app/lib/supabaseClient";
 
-interface QuizProgresso {
+interface Pergunta {
+  id: number;
+  quiz_id: number;
+  texto: string;
+  alternativas: string[];
+  correta: number;
+  tags?: string[];
+}
+
+interface Quiz {
+  id: number;
   titulo: string;
+  tema: string;
   materia: string;
-  acertos: number;
-  erros: number;
-  ultimaPontuacao: number; // %
+  anoestudo: string;
+  tags: string[];
 }
 
-interface AlunoProgresso {
-  username: string;
-  quizzesFeitos: QuizProgresso[];
+// Normaliza strings: remove acentos, deixa minúsculo e tira espaços extras
+function normalize(str: string) {
+  return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
 }
 
-export default function AlunoDashboard() {
-  const [aluno, setAluno] = useState({ username: "Aluno Exemplo" });
-  const [progresso, setProgresso] = useState<AlunoProgresso | null>(null);
-  const [ranking, setRanking] = useState<AlunoProgresso[]>([]);
+const EXPIRATION_TIME = 20 * 60 * 1000; // 20 minutos
 
+export default function QuizPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = use(params); // unwrap da Promise
+  const normalizedSlug = normalize(slug);
+
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [perguntas, setPerguntas] = useState<Pergunta[]>([]);
+  const [perguntaAtual, setPerguntaAtual] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [acertos, setAcertos] = useState(0);
+  const [erros, setErros] = useState(0);
+  const [temaAtual, setTemaAtual] = useState<string>("");
+
+  // Busca quiz e perguntas no Supabase
   useEffect(() => {
-    // Dados simulados do aluno
-    const progressoSimulado: AlunoProgresso = {
-      username: aluno.username,
-      quizzesFeitos: [
-        { titulo: "Matemática Básica", materia: "Matemática", acertos: 8, erros: 2, ultimaPontuacao: 80 },
-        { titulo: "Português Avançado", materia: "Português", acertos: 6, erros: 4, ultimaPontuacao: 60 },
-        { titulo: "Ciências Naturais", materia: "Ciências", acertos: 7, erros: 3, ultimaPontuacao: 70 },
-      ],
+    const fetchQuiz = async () => {
+      try {
+        // 🔹 Busca todos os quizzes
+        const { data: quizzes, error: quizError } = await supabase
+          .from("Quiz")
+          .select("*");
+
+        if (quizError || !quizzes) {
+          console.error("Erro ao buscar quizzes:", quizError);
+          return;
+        }
+
+        // 🔹 Filtra quiz pelo slug normalizado
+        const quizData = quizzes.find((q: Quiz) =>
+          q.tags?.some((tag) => normalize(tag).includes(normalizedSlug))
+        );
+
+        if (!quizData) {
+          console.log("Nenhum quiz encontrado para", slug);
+          return;
+        }
+
+        setQuiz(quizData);
+
+        // 🔹 Busca perguntas relacionadas ao quiz
+        const { data: perguntasData, error: perguntasError } = await supabase
+          .from("Pergunta")
+          .select("*")
+          .eq("quiz_id", quizData.id);
+
+        if (perguntasError) {
+          console.error("Erro ao buscar perguntas:", perguntasError);
+          return;
+        }
+
+        if (perguntasData) {
+          // 🔹 Checa progresso salvo no localStorage
+          const storedRaw = localStorage.getItem(`quiz-${slug}`);
+          let initialState = {
+            perguntas: (perguntasData as Pergunta[]).sort(() => Math.random() - 0.5).slice(0, 10),
+            perguntaAtual: 0,
+            acertos: 0,
+            erros: 0,
+            selected: null,
+            showFeedback: false,
+            temaAtual: slug,
+            timestamp: Date.now(),
+          };
+
+          if (storedRaw) {
+            const stored = JSON.parse(storedRaw);
+            const expired = Date.now() - stored.timestamp > EXPIRATION_TIME;
+            if (!expired && stored.perguntas?.length) {
+              initialState = stored;
+            }
+          }
+
+          setPerguntas(initialState.perguntas);
+          setPerguntaAtual(initialState.perguntaAtual);
+          setAcertos(initialState.acertos);
+          setErros(initialState.erros);
+          setSelected(initialState.selected);
+          setShowFeedback(initialState.showFeedback);
+          setTemaAtual(initialState.temaAtual || slug);
+        }
+      } catch (err) {
+        console.error("Erro inesperado ao buscar quiz:", err);
+      }
     };
-    setProgresso(progressoSimulado);
 
-    // Ranking simulado
-    const rankingSimulado: AlunoProgresso[] = [
-      progressoSimulado,
-      { username: "Aluno 2", quizzesFeitos: [{ titulo: "", materia: "", acertos: 15, erros: 5, ultimaPontuacao: 75 }] },
-      { username: "Aluno 3", quizzesFeitos: [{ titulo: "", materia: "", acertos: 12, erros: 3, ultimaPontuacao: 80 }] },
-      { username: "Aluno 4", quizzesFeitos: [{ titulo: "", materia: "", acertos: 10, erros: 5, ultimaPontuacao: 66 }] },
-      { username: "Aluno 5", quizzesFeitos: [{ titulo: "", materia: "", acertos: 9, erros: 6, ultimaPontuacao: 60 }] },
-    ];
-    setRanking(rankingSimulado);
-  }, [aluno.username]);
+    fetchQuiz();
+  }, [slug, normalizedSlug]);
 
-  if (!progresso) return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
+  // Salva progresso no localStorage
+  useEffect(() => {
+    if (!quiz || perguntas.length === 0) return;
+    localStorage.setItem(
+      `quiz-${slug}`,
+      JSON.stringify({
+        perguntas,
+        perguntaAtual,
+        acertos,
+        erros,
+        selected,
+        showFeedback,
+        temaAtual,
+        timestamp: Date.now(),
+      })
+    );
+  }, [slug, perguntas, perguntaAtual, acertos, erros, selected, showFeedback, temaAtual, quiz]);
 
-  const totalQuizzesFeitos = progresso.quizzesFeitos.length;
-  const totalAcertos = progresso.quizzesFeitos.reduce((sum, q) => sum + q.acertos, 0);
-  const totalErros = progresso.quizzesFeitos.reduce((sum, q) => sum + q.erros, 0);
+  const handleSelect = (idx: number) => {
+    if (selected !== null || !perguntas[perguntaAtual]) return;
 
-  const materiasMap: { [materia: string]: { acertos: number; erros: number } } = {};
-  progresso.quizzesFeitos.forEach((q) => {
-    if (!materiasMap[q.materia]) materiasMap[q.materia] = { acertos: 0, erros: 0 };
-    materiasMap[q.materia].acertos += q.acertos;
-    materiasMap[q.materia].erros += q.erros;
-  });
+    setSelected(idx);
+    setShowFeedback(true);
+
+    const isCorrect = idx === perguntas[perguntaAtual].correta;
+    if (isCorrect) setAcertos((prev) => prev + 1);
+    else setErros((prev) => prev + 1);
+  };
+
+  const handleNext = () => {
+    setSelected(null);
+    setShowFeedback(false);
+    setPerguntaAtual((prev) => prev + 1);
+  };
+
+  const currentQuestion = perguntas[perguntaAtual];
+  const isCorrect = selected === currentQuestion?.correta;
+  const isLastQuestion = perguntaAtual === perguntas.length - 1;
+
+  if (!quiz || perguntas.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-800">
+        <div>Nenhuma pergunta encontrada para &quot;{slug}&quot;</div>
+      </div>
+    );
+  }
+
+  if (isLastQuestion && selected !== null && showFeedback) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-6">
+        <header className="w-full max-w-4xl flex items-center justify-between bg-gray-800 text-white px-6 py-4 rounded-2xl shadow-2xl mb-12">
+          <Link href="/">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold">
+                ES
+              </div>
+              <div className="font-semibold text-lg">EricSaber</div>
+            </div>
+          </Link>
+        </header>
+
+        <h1 className="text-4xl font-bold mb-6">{quiz.titulo.toUpperCase()} - Resultado</h1>
+        <p className="text-xl mb-2">Assunto: {temaAtual}</p>
+        <p className="text-2xl mb-2">Acertos: {acertos}</p>
+        <p className="text-2xl mb-2">Erros: {erros}</p>
+        <p className="text-2xl mb-6">
+          Pontuação: {acertos} / {perguntas.length}
+        </p>
+        <button
+          className="px-6 py-3 bg-green-500 rounded-full hover:bg-green-600"
+          onClick={() => {
+            localStorage.removeItem(`quiz-${slug}`);
+            setPerguntas(perguntas.sort(() => Math.random() - 0.5).slice(0, 10));
+            setPerguntaAtual(0);
+            setSelected(null);
+            setShowFeedback(false);
+            setAcertos(0);
+            setErros(0);
+          }}
+        >
+          Reiniciar Quiz
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      {/* Cabeçalho */}
-      <header className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl">
-            {aluno.username.slice(0, 2).toUpperCase()}
+    <div className="h-screen bg-gray-900 flex flex-col md:items-center md:justify-center p-0">
+      <div className="flex-1 w-full md:w-full md:max-w-4xl bg-white md:rounded-2xl md:shadow-2xl overflow-hidden flex flex-col">
+        {/* Header */}
+        <header className="w-full flex items-center justify-between bg-gray-800 text-white px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold">ES</div>
+            <div className="font-semibold text-lg">EricSaber</div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">{aluno.username}</h1>
-            <p className="text-gray-600">Dashboard do aluno</p>
+          <div className="text-sm">
+            Pergunta {perguntaAtual + 1} de {perguntas.length}
           </div>
-        </div>
-        <Link
-          href="/quiz"
-          className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600"
-        >
-          Ir para pesquisa de quizzes
-        </Link>
-      </header>
+        </header>
 
-      {/* Estatísticas gerais */}
-      <section className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-2xl shadow text-center">
-          <h2 className="text-gray-500">Total de Quizzes</h2>
-          <p className="text-2xl font-bold">{totalQuizzesFeitos}</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl shadow text-center">
-          <h2 className="text-gray-500">Total de Acertos</h2>
-          <p className="text-2xl font-bold">{totalAcertos}</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl shadow text-center">
-          <h2 className="text-gray-500">Total de Erros</h2>
-          <p className="text-2xl font-bold">{totalErros}</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl shadow text-center">
-          <h2 className="text-gray-500">Percentual Médio</h2>
-          <p className="text-2xl font-bold">
-            {totalQuizzesFeitos > 0 ? Math.round((totalAcertos / (totalAcertos + totalErros)) * 100) : 0}%
-          </p>
-        </div>
-      </section>
+        {/* Main content */}
+        <main className="flex-1 flex flex-col justify-center items-center px-6 py-6 md:py-12 overflow-auto">
+          <h1 className="text-2xl md:text-4xl font-extrabold text-center text-gray-800 mb-6">
+            {perguntaAtual + 1}. {currentQuestion?.texto}
+          </h1>
 
-      {/* Pontuação por matéria */}
-      <section className="mb-6">
-        <h2 className="text-xl font-bold mb-4">Pontuação por Matéria</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {Object.entries(materiasMap).map(([materia, stats]) => {
-            const total = stats.acertos + stats.erros;
-            const perc = total > 0 ? Math.round((stats.acertos / total) * 100) : 0;
-            return (
-              <div key={materia} className="bg-white p-4 rounded-2xl shadow">
-                <h3 className="font-semibold mb-2">{materia}</h3>
-                <div className="text-sm text-gray-500 mb-2">
-                  Acertos: {stats.acertos} | Erros: {stats.erros}
-                </div>
-                <div className="w-full bg-gray-200 h-3 rounded-full">
-                  <div className="bg-blue-500 h-3 rounded-full" style={{ width: `${perc}%` }} />
-                </div>
-                <p className="text-sm mt-1">{perc}% de acerto</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+          <div className="space-y-4 w-full max-w-3xl">
+            {currentQuestion?.alternativas.map((alt, idx) => {
+              const selectedClass =
+                selected === idx
+                  ? "ring-2 ring-offset-2 ring-gray-400"
+                  : "hover:ring-2 hover:ring-offset-2 hover:ring-gray-200";
+              const feedbackClass = showFeedback
+                ? idx === currentQuestion.correta
+                  ? "bg-green-50 border-green-400"
+                  : selected === idx
+                  ? "bg-red-50 border-red-300"
+                  : "bg-white"
+                : "bg-white";
 
-      {/* Ranking */}
-      <section className="mb-6">
-        <h2 className="text-xl font-bold mb-4">Ranking dos Alunos</h2>
-        <div className="bg-white p-4 rounded-2xl shadow overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b">
-                <th className="py-2 px-2">#</th>
-                <th className="py-2 px-2">Aluno</th>
-                <th className="py-2 px-2">Acertos Totais</th>
-                <th className="py-2 px-2">Erros Totais</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ranking.map((a, idx) => {
-                const acertosTotais = a.quizzesFeitos.reduce((sum, q) => sum + q.acertos, 0);
-                const errosTotais = a.quizzesFeitos.reduce((sum, q) => sum + q.erros, 0);
-                return (
-                  <tr key={a.username} className={a.username === aluno.username ? "bg-blue-50" : ""}>
-                    <td className="py-2 px-2">{idx + 1}</td>
-                    <td className="py-2 px-2">{a.username}</td>
-                    <td className="py-2 px-2">{acertosTotais}</td>
-                    <td className="py-2 px-2">{errosTotais}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
+              return (
+                <button
+                  key={idx}
+                  onClick={() => handleSelect(idx)}
+                  className={`w-full text-left flex items-center gap-4 px-5 py-4 border rounded-full shadow-sm transition ${selectedClass} ${feedbackClass}`}
+                >
+                  <div className="w-12 h-12 sm:w-9 sm:h-9 rounded-full bg-gray-800 flex items-center justify-center text-white font-bold text-lg sm:text-base">
+                    {String.fromCharCode(65 + idx)}
+                  </div>
+                  <div className="flex-1 text-gray-800">{alt}</div>
+                </button>
+              );
+            })}
+          </div>
 
-      {/* Últimas pontuações */}
-      <section>
-        <h2 className="text-xl font-bold mb-4">Últimas Pontuações</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {progresso.quizzesFeitos.map((q, idx) => {
-            const total = q.acertos + q.erros;
-            const perc = total > 0 ? Math.round((q.acertos / total) * 100) : 0;
-            return (
-              <div key={idx} className="bg-white p-4 rounded-2xl shadow">
-                <h3 className="font-semibold mb-2">{q.titulo}</h3>
-                <div className="text-sm text-gray-500 mb-2">
-                  Acertos: {q.acertos} | Erros: {q.erros} | Última pontuação: {q.ultimaPontuacao}%
+          {showFeedback && selected !== null && (
+            <div className="max-w-3xl mx-auto mt-6">
+              {isCorrect ? (
+                <div className="rounded-md p-3 bg-green-50 border border-green-200 text-green-800">
+                  Resposta correta ✓
                 </div>
-                <div className="w-full bg-gray-200 h-3 rounded-full">
-                  <div className="bg-green-500 h-3 rounded-full" style={{ width: `${perc}%` }} />
+              ) : (
+                <div className="rounded-md p-3 bg-red-50 border border-red-200 text-red-800">
+                  Resposta incorreta ✕
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+              )}
+            </div>
+          )}
+
+          {!isLastQuestion && showFeedback && (
+            <div className="max-w-3xl mx-auto mt-8 flex gap-4 items-center justify-center">
+              <button
+                onClick={handleNext}
+                className="px-6 py-3 bg-gray-800 text-white rounded-full shadow disabled:opacity-50"
+              >
+                Próxima Pergunta
+              </button>
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
