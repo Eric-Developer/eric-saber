@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/app/lib/supabaseClient";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -11,20 +10,35 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
-    // Consulta no Supabase se existe o usuário com name e password
-    const { data, error } = await supabase
-      .from("User")
-      .select("*")
-      .eq("username", username)
-      .eq("password", password)
-      .single();
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (error || !data) {
-      setError("Credenciais inválidas");
-    } else {
-      setError("");
-      router.push("/"); // redireciona para a página principal
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Erro ao fazer login");
+        return;
+      }
+
+      // Aqui você recebe o token e os dados do usuário
+      const { token, user } = data;
+
+      console.log("JWT:", token);
+      console.log("Usuário:", user);
+
+      // Redireciona para a página principal
+      router.push("/");
+    } catch (err) {
+      console.error(err);
+      setError("Erro ao conectar com o servidor");
     }
   };
 

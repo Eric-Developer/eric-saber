@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/app/lib/supabaseClient";
+import bcrypt from "bcryptjs";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -14,33 +15,40 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validação de senhas
     if (password !== confirmPassword) {
       setError("As senhas não coincidem");
       return;
     }
 
-    // Tenta inserir no Supabase
-    const { data, error } = await supabase
-      .from("User")
-      .insert([{ username, password }])
-      .select()
-      .single();
+    try {
+      // 🔹 Criptografa a senha
+      const hashedPassword = bcrypt.hashSync(password, 10);
 
-    if (error) {
-      setError("Erro ao cadastrar usuário: " + error.message);
-      setSuccess("");
-    } else {
-      setError("");
-      setSuccess("Cadastro realizado com sucesso!");
-      setUsername("");
-      setPassword("");
-      setConfirmPassword("");
+      // 🔹 Insere no Supabase
+      const { data, error } = await supabase
+        .from("User")
+        .insert([{ username, password: hashedPassword }])
+        .select()
+        .single();
 
-      // Redireciona para login depois de 1.5s
-      setTimeout(() => {
-        router.push("/login");
-      }, 1500);
+      if (error) {
+        setError("Erro ao cadastrar usuário: " + error.message);
+        setSuccess("");
+      } else {
+        setError("");
+        setSuccess("Cadastro realizado com sucesso!");
+        setUsername("");
+        setPassword("");
+        setConfirmPassword("");
+
+        // Redireciona para login
+        setTimeout(() => {
+          router.push("/login");
+        }, 1500);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Erro inesperado ao cadastrar usuário");
     }
   };
 
@@ -57,6 +65,7 @@ export default function RegisterPage() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            required
           />
           <input
             type="password"
@@ -64,6 +73,7 @@ export default function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            required
           />
           <input
             type="password"
@@ -71,13 +81,10 @@ export default function RegisterPage() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            required
           />
-          {error && (
-            <p className="text-red-600 font-semibold text-center">{error}</p>
-          )}
-          {success && (
-            <p className="text-green-600 font-semibold text-center">{success}</p>
-          )}
+          {error && <p className="text-red-600 font-semibold text-center">{error}</p>}
+          {success && <p className="text-green-600 font-semibold text-center">{success}</p>}
           <button
             type="submit"
             className="mt-4 w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-full font-semibold transition"
