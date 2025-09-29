@@ -24,10 +24,16 @@ export default function RegisterPage() {
       // 🔹 Criptografa a senha
       const hashedPassword = bcrypt.hashSync(password, 10);
 
-      // 🔹 Insere no Supabase
+      // 🔹 Insere no Supabase com type padrão "student"
       const { data, error } = await supabase
         .from("User")
-        .insert([{ username, password: hashedPassword }])
+        .insert([
+          {
+            username,
+            password: hashedPassword,
+            type: "student", // ✅ Garantindo que seja student
+          }
+        ])
         .select()
         .single();
 
@@ -41,7 +47,7 @@ export default function RegisterPage() {
         setPassword("");
         setConfirmPassword("");
 
-        // Redireciona para login
+        // Redireciona para login após 1,5s
         setTimeout(() => {
           router.push("/login");
         }, 1500);

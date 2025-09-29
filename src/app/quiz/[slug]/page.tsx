@@ -40,13 +40,11 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
   const [erros, setErros] = useState(0);
   const [temaAtual, setTemaAtual] = useState<string>("");
   const [showResult, setShowResult] = useState(false);
+  const [resultadoSalvo, setResultadoSalvo] = useState(false);
 
-  const [resultadoSalvo, setResultadoSalvo] = useState(false); // evita duplicação
+  const userId =
+    typeof window !== "undefined" ? Number(localStorage.getItem("userId")) : null;
 
-  // 🔹 ID do usuário logado
-  const userId = 1; // substitua pelo ID real do usuário logado
-
-  // 🔹 Busca quiz e perguntas
   useEffect(() => {
     const fetchQuiz = async () => {
       const { data: quizzes } = await supabase.from("Quiz").select("*");
@@ -104,9 +102,8 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
     setResultadoSalvo(false);
   };
 
-  // 🔹 Função para finalizar o quiz e salvar resultado **uma vez**
   const handleFinish = async () => {
-    if (!quiz || resultadoSalvo) return;
+    if (!quiz || resultadoSalvo || !userId) return;
 
     const pontuacao = Math.round((acertos / perguntas.length) * 100);
 
@@ -121,10 +118,7 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
     ]);
 
     if (error) console.error("Erro ao salvar resultado:", error);
-    else {
-      console.log("Resultado salvo:", data);
-      setResultadoSalvo(true);
-    }
+    else setResultadoSalvo(true);
 
     setShowResult(true);
   };
@@ -134,9 +128,9 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
 
   if (!quiz || perguntas.length === 0) {
     return (
-     <div className="min-h-screen flex items-center justify-center text-gray-800">
-  Nenhuma pergunta encontrada para {slug}
-</div>
+      <div className="min-h-screen flex items-center justify-center text-gray-800">
+        Nenhuma pergunta encontrada para {slug}
+      </div>
     );
   }
 
@@ -149,7 +143,7 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
         erros={erros}
         total={perguntas.length}
         onRestart={handleRestart}
-        userId={userId}
+        userId={userId!}
       />
     );
   }
@@ -166,7 +160,7 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
           onSelect={handleSelect}
           onNext={handleNext}
           isLast={isLastQuestion}
-          onFinish={handleFinish} // 🔹 botão finaliza e salva
+          onFinish={handleFinish}
         />
       </div>
     </div>
