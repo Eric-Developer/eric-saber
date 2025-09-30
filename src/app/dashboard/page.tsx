@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/app/lib/supabaseClient";
 import { useAuth } from "../hooks/useAuth";
+import Header from "../components/Header";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 interface Quiz {
   id: number;
@@ -116,7 +118,7 @@ export default function AlunoDashboard() {
   if (authLoading || loading)
     return (
       <div className="min-h-screen flex items-center justify-center text-white">
-        Carregando...
+        <LoadingOverlay/>
       </div>
     );
 
@@ -140,8 +142,8 @@ export default function AlunoDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-900 p-4 sm:p-6 flex flex-col items-center">
-      {/* Cabeçalho */}
-      <header className="w-full max-w-4xl flex flex-col sm:flex-row items-center justify-between bg-gray-800 text-white px-4 sm:px-6 py-4 rounded-2xl shadow-2xl mb-6 sm:mb-12 gap-4 sm:gap-0">
+      <Header/>
+<div className="mt-17 w-full max-w-4xl flex flex-col sm:flex-row items-center justify-between bg-gray-800 text-white px-4 sm:px-6 py-4 rounded-2xl shadow-2xl mb-6 sm:mb-12 gap-4 sm:gap-0">
         <div className="flex items-center gap-4 w-full sm:w-auto">
           <div className="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-white font-bold text-xl">
             {user?.email.slice(0, 2).toUpperCase()}
@@ -152,14 +154,13 @@ export default function AlunoDashboard() {
           </div>
         </div>
         <Link
-          href="/quiz"
+          href="/search"
           className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 w-full sm:w-auto text-center"
         >
           Pesquisar Quizzes
         </Link>
-      </header>
+      </div>
 
-      {/* Estatísticas gerais */}
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6 w-full max-w-4xl">
         <div className="bg-gray-800 p-4 rounded-2xl shadow text-center">
           <h2 className="text-gray-300 text-sm sm:text-base">Total de Quizzes</h2>
@@ -183,7 +184,6 @@ export default function AlunoDashboard() {
         </div>
       </section>
 
-      {/* Pontuação por matéria */}
       <section className="mb-6 w-full max-w-4xl">
         <h2 className="text-xl font-bold text-white mb-4">Pontuação por Matéria</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

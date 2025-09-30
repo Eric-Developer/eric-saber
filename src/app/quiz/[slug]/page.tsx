@@ -4,6 +4,8 @@ import { supabase } from "@/app/lib/supabaseClient";
 import { QuizHeader } from "@/app/components/quiz/QuizHeader";
 import { QuizQuestion } from "@/app/components/quiz/QuizQuestion";
 import { QuizResult } from "@/app/components/quiz/QuizResult";
+import Header from "@/app/components/Header"; 
+import { useRouter } from "next/navigation";
 
 interface Pergunta {
   id: number;
@@ -31,6 +33,9 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
   const { slug } = use(params);
   const normalizedSlug = normalize(slug);
 
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [perguntas, setPerguntas] = useState<Pergunta[]>([]);
   const [perguntaAtual, setPerguntaAtual] = useState(0);
@@ -42,10 +47,26 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
   const [showResult, setShowResult] = useState(false);
   const [resultadoSalvo, setResultadoSalvo] = useState(false);
 
-  const userId =
-    typeof window !== "undefined" ? Number(localStorage.getItem("userId")) : null;
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) {
+        router.push("/login"); 
+        return;
+      }
+      const storedId = localStorage.getItem("userId");
+      if (storedId) setUserId(Number(storedId));
+
+      setIsLoading(false);
+    };
+    checkAuth();
+  }, [router]);
+
+  useEffect(() => {
+    if (isLoading) return;
+
     const fetchQuiz = async () => {
       const { data: quizzes } = await supabase.from("Quiz").select("*");
       const quizData = quizzes?.find((q: Quiz) =>
@@ -74,7 +95,7 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
     };
 
     fetchQuiz();
-  }, [slug, normalizedSlug]);
+  }, [slug, normalizedSlug, isLoading]);
 
   const handleSelect = (idx: number) => {
     if (selected !== null || !perguntas[perguntaAtual]) return;
@@ -107,7 +128,7 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
 
     const pontuacao = Math.round((acertos / perguntas.length) * 100);
 
-    const { data, error } = await supabase.from("QuizResultado").insert([
+    const { error } = await supabase.from("QuizResultado").insert([
       {
         user_id: userId,
         quiz_id: quiz.id,
@@ -123,43 +144,55 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
     setShowResult(true);
   };
 
-  const currentQuestion = perguntas[perguntaAtual];
-  const isLastQuestion = perguntaAtual === perguntas.length - 1;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white bg-gray-900">
+        Verificando autenticação...
+      </div>
+    );
+  }
 
   if (!quiz || perguntas.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-800">
-        Nenhuma pergunta encontrada para {slug}
+      <div className="min-h-screen flex flex-col bg-gray-900 text-white">
+        <Header />
+        <div className="flex flex-1 items-center justify-center">
+          Nenhuma pergunta encontrada para {slug}
+        </div>
       </div>
     );
   }
 
   if (showResult) {
     return (
-      <QuizResult
-        quiz={quiz}
-        temaAtual={temaAtual}
-        acertos={acertos}
-        erros={erros}
-        total={perguntas.length}
-        onRestart={handleRestart}
-        userId={userId!}
-      />
+      <div className="min-h-screen flex flex-col bg-gray-900 text-white">
+        <Header />
+        <QuizResult
+          quiz={quiz}
+          temaAtual={temaAtual}
+          acertos={acertos}
+          erros={erros}
+          total={perguntas.length}
+          onRestart={handleRestart}
+          userId={userId!}
+        />
+      </div>
     );
   }
 
   return (
-    <div className="h-screen bg-gray-900 flex flex-col md:items-center md:justify-center p-0">
-      <div className="flex-1 w-full md:max-w-4xl bg-white md:rounded-2xl md:shadow-2xl overflow-hidden flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gray-900 text-white">
+      <Header />
+      <div className="flex-1 w-full md:max-w-4xl mx-auto bg-white md:rounded-2xl md:shadow-2xl overflow-hidden flex flex-col mt-20">
         <QuizHeader perguntaAtual={perguntaAtual} total={perguntas.length} />
         <QuizQuestion
-          pergunta={currentQuestion}
+          pergunta={perguntas[perguntaAtual]}
           perguntaAtual={perguntaAtual}
           selected={selected}
           showFeedback={showFeedback}
           onSelect={handleSelect}
           onNext={handleNext}
-          isLast={isLastQuestion}
+          isLast={perguntaAtual === perguntas.length - 1}
           onFinish={handleFinish}
         />
       </div>
