@@ -57,7 +57,7 @@ export default function Header() {
           <Link href="/dashboard" className="hover:text-green-400 transition font-medium">
             Painel
           </Link>
-          <Link href="/perfil" className="hover:text-green-400 transition font-medium">
+          <Link href="/profile" className="hover:text-green-400 transition font-medium">
             Perfil
           </Link>
 
