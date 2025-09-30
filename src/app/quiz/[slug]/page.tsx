@@ -1,12 +1,12 @@
 "use client";
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import { supabase } from "@/app/lib/supabaseClient";
 import { QuizHeader } from "@/app/components/quiz/QuizHeader";
 import { QuizQuestion } from "@/app/components/quiz/QuizQuestion";
 import { QuizResult } from "@/app/components/quiz/QuizResult";
-import Header from "@/app/components/Header"; 
+import Header from "@/app/components/Header";
 import { useRouter } from "next/navigation";
-
+import { useAuth } from "@/app/hooks/useAuth";
 interface Pergunta {
   id: number;
   quiz_id: number;
@@ -29,9 +29,10 @@ function normalize(str: string) {
   return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
 }
 
-export default function QuizPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+export default function QuizPage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const normalizedSlug = normalize(slug);
+  const { user } = useAuth();
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -47,23 +48,27 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
   const [showResult, setShowResult] = useState(false);
   const [resultadoSalvo, setResultadoSalvo] = useState(false);
 
-  const [userId, setUserId] = useState<number | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
+  // Verifica autenticação
   useEffect(() => {
     const checkAuth = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (!data.user) {
-        router.push("/login"); 
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data.user) {
+        router.push("/login");
         return;
       }
-      const storedId = localStorage.getItem("userId");
-      if (storedId) setUserId(Number(storedId));
+
+      // pega o id direto do supabase
+      setUserId(data.user.id);
+      localStorage.setItem("userId", data.user.id);
 
       setIsLoading(false);
     };
     checkAuth();
   }, [router]);
 
+  // Busca quiz e perguntas
   useEffect(() => {
     if (isLoading) return;
 
@@ -97,6 +102,7 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
     fetchQuiz();
   }, [slug, normalizedSlug, isLoading]);
 
+  // Seleciona alternativa
   const handleSelect = (idx: number) => {
     if (selected !== null || !perguntas[perguntaAtual]) return;
     setSelected(idx);
@@ -106,12 +112,14 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
     else setErros((p) => p + 1);
   };
 
+  // Vai para próxima
   const handleNext = () => {
     setSelected(null);
     setShowFeedback(false);
     setPerguntaAtual((p) => p + 1);
   };
 
+  // Reinicia quiz
   const handleRestart = () => {
     setPerguntas(perguntas.sort(() => Math.random() - 0.5).slice(0, 10));
     setPerguntaAtual(0);
@@ -123,26 +131,42 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
     setResultadoSalvo(false);
   };
 
+  // Finaliza quiz e salva no banco
   const handleFinish = async () => {
-    if (!quiz || resultadoSalvo || !userId) return;
+  if (!quiz || resultadoSalvo) return;
 
-    const pontuacao = Math.round((acertos / perguntas.length) * 100);
+  const pontuacao = Math.round((acertos / perguntas.length) * 100);
 
-    const { error } = await supabase.from("QuizResultado").insert([
-      {
-        user_id: userId,
-        quiz_id: quiz.id,
-        acertos,
-        erros,
-        pontuacao,
-      },
-    ]);
+  try {
+    if (userId) {
+      const username = user?.username
 
-    if (error) console.error("Erro ao salvar resultado:", error);
-    else setResultadoSalvo(true);
+      const { error } = await supabase.from("QuizResultado").insert([
+        {
+          user_id: userId,
+          quiz_id: quiz.id,
+          acertos,
+          erros,
+          pontuacao,
+          username
+        },
+      ]);
 
-    setShowResult(true);
-  };
+      if (error) {
+        console.error("Erro ao salvar resultado:", error);
+      } else {
+        setResultadoSalvo(true);
+      }
+    } else {
+      console.error("Nenhum userId encontrado!");
+    }
+  } catch (err) {
+    console.error("Erro inesperado ao finalizar quiz:", err);
+  }
+
+  setShowResult(true);
+};
+
 
   if (isLoading) {
     return (
@@ -152,6 +176,7 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
     );
   }
 
+  // Nenhum quiz encontrado
   if (!quiz || perguntas.length === 0) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-900 text-white">
@@ -163,6 +188,7 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
     );
   }
 
+  // Resultado
   if (showResult) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-900 text-white">
@@ -180,6 +206,7 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
     );
   }
 
+  // Tela de perguntas
   return (
     <div className="min-h-screen flex flex-col bg-gray-900 text-white">
       <Header />

@@ -1,20 +1,24 @@
 "use client";
-import React from "react";
-import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import { supabase } from "@/app/lib/supabaseClient";
 
 interface Quiz {
   id: number;
   titulo: string;
+  tema: string;
+  materia: string;
+  anoestudo: string;
+  tags: string[];
 }
 
-interface QuizResultProps {
-  quiz: Quiz;
-  temaAtual: string;
+interface QuizResultado {
+  id: number;
+  quiz_id: number;
+  user_id: string;
   acertos: number;
   erros: number;
-  total: number;
-  onRestart: () => void;
-  userId: number; // apenas para referência, não é usado aqui
+  pontuacao: number;
+  created_at: string;
 }
 
 export function QuizResult({
@@ -24,31 +28,87 @@ export function QuizResult({
   erros,
   total,
   onRestart,
-}: QuizResultProps) {
-  const pontuacao = Math.round((acertos / total) * 100);
+  userId,
+}: {
+  quiz: Quiz;
+  temaAtual: string;
+  acertos: number;
+  erros: number;
+  total: number;
+  onRestart: () => void;
+  userId: string;
+}) {
+  const [resultadoBanco, setResultadoBanco] = useState<QuizResultado | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchResultado = async () => {
+      if (!quiz || !userId) return;
+
+      const { data, error } = await supabase
+        .from("QuizResultado")
+        .select("*")
+        .eq("quiz_id", quiz.id)
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (error) {
+        console.error("Erro ao buscar resultado:", error);
+      } else if (data && data.length > 0) {
+        setResultadoBanco(data[0]);
+      }
+      setLoading(false);
+    };
+
+    fetchResultado();
+  }, [quiz, userId]);
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-white">
+        Carregando resultado...
+      </div>
+    );
+  }
+
+  const resultado = resultadoBanco || {
+    acertos,
+    erros,
+    pontuacao: Math.round((acertos / total) * 100),
+  };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white p-6">
-      <header className="w-full max-w-4xl flex items-center justify-between bg-gray-800 text-white px-6 py-4 rounded-2xl shadow-2xl mb-12">
-        <Link href="/">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-sm font-bold">ES</div>
-            <div className="font-semibold text-lg">EricSaber</div>
-          </div>
-        </Link>
-      </header>
+    <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-gray-900">
+      <h1 className="text-3xl font-extrabold mb-4">{quiz.titulo}</h1>
+      <p className="text-lg text-gray-700 mb-6">
+        Tema: <span className="font-semibold">{temaAtual}</span>
+      </p>
 
-      <h1 className="text-4xl font-bold mb-6">{quiz.titulo.toUpperCase()} - Resultado</h1>
-      <p className="text-xl mb-2">Assunto: {temaAtual}</p>
-      <p className="text-2xl mb-2">Acertos: {acertos}</p>
-      <p className="text-2xl mb-2">Erros: {erros}</p>
-      <p className="text-2xl mb-6">Pontuação: {pontuacao}%</p>
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6 space-y-4">
+        <div className="flex justify-between">
+          <span className="font-semibold">Acertos:</span>
+          <span>{resultado.acertos}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="font-semibold">Erros:</span>
+          <span>{resultado.erros}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="font-semibold">Total de Questões:</span>
+          <span>{total}</span>
+        </div>
+        <div className="flex justify-between text-lg font-bold text-green-700">
+          <span>Pontuação:</span>
+          <span>{resultado.pontuacao}%</span>
+        </div>
+      </div>
 
       <button
-        className="px-6 py-3 bg-green-500 rounded-full hover:bg-green-600"
         onClick={onRestart}
+        className="mt-8 px-6 py-3 bg-gray-800 text-white rounded-full shadow hover:bg-gray-700 transition"
       >
-        Reiniciar Quiz
+        Refazer Quiz
       </button>
     </div>
   );

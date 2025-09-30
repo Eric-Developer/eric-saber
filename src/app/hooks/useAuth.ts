@@ -8,6 +8,7 @@ export interface User {
   email: string;
   username?: string;
   type?: "student" | "teacher" | "admin";
+  auth_id: string;
 }
 
 export function useAuth() {

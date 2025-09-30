@@ -105,7 +105,6 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
-      {/* Loading Overlay */}
       {loading && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-90 z-50 flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
@@ -126,7 +125,7 @@ export default function RegisterPage() {
             placeholder="Usuário"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-400"
             required
           />
           <input
@@ -134,7 +133,7 @@ export default function RegisterPage() {
             placeholder="E-mail"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-400"
             required
           />
           <input
@@ -142,7 +141,7 @@ export default function RegisterPage() {
             placeholder="Senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-400"
             required
           />
           <input
@@ -150,7 +149,7 @@ export default function RegisterPage() {
             placeholder="Confirmar Senha"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-400"
             required
           />
 
