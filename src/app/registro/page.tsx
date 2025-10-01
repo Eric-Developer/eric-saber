@@ -16,14 +16,31 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    setError("");
+    setSuccess("");
+
+    // 🔹 Validações iniciais
+    if (username.includes(" ")) {
+      setError("O nome de usuário não pode conter espaços.");
+      return;
+    }
+
+    if (!email.endsWith("@gmail.com")) {
+      setError("O e-mail precisa ser do domínio @gmail.com.");
+      return;
+    }
+
+    if (password.length < 6 || password.length > 8) {
+      setError("A senha deve ter entre 6 e 8 caracteres.");
+      return;
+    }
+
     if (password !== confirmPassword) {
-      setError("As senhas não coincidem");
+      setError("As senhas não coincidem.");
       return;
     }
 
     setLoading(true);
-    setError("");
-    setSuccess("");
 
     try {
       // 🔹 Verifica se o username já existe
@@ -39,7 +56,7 @@ export default function RegisterPage() {
         return;
       }
 
-      // 🔹 Verifica se o email já existe na tabela User
+      // 🔹 Verifica se o email já existe
       const { data: existingEmail } = await supabase
         .from("User")
         .select("id")
@@ -67,6 +84,7 @@ export default function RegisterPage() {
         return;
       }
 
+      // 🔹 Salva dados na tabela User
       const { error: tableError } = await supabase
         .from("User")
         .insert([
@@ -75,7 +93,7 @@ export default function RegisterPage() {
             username,
             email,
             type: "student",
-          }
+          },
         ]);
 
       if (tableError) {
@@ -89,7 +107,6 @@ export default function RegisterPage() {
       setPassword("");
       setConfirmPassword("");
       setSuccess("Cadastro realizado com sucesso!");
-      setError("");
 
       setTimeout(() => {
         router.push("/login");
@@ -97,7 +114,7 @@ export default function RegisterPage() {
 
     } catch (err) {
       console.error(err);
-      setError("Erro inesperado ao cadastrar usuário");
+      setError("Erro inesperado ao cadastrar usuário.");
     } finally {
       setLoading(false);
     }
@@ -130,7 +147,7 @@ export default function RegisterPage() {
           />
           <input
             type="email"
-            placeholder="E-mail"
+            placeholder="E-mail (@gmail.com)"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-400"
@@ -138,7 +155,7 @@ export default function RegisterPage() {
           />
           <input
             type="password"
-            placeholder="Senha"
+            placeholder="Senha (6-8 caracteres)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-gray-400"

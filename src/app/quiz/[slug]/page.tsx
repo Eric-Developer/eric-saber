@@ -7,6 +7,7 @@ import { QuizResult } from "@/app/components/quiz/QuizResult";
 import Header from "@/app/components/Header";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
+
 interface Pergunta {
   id: number;
   quiz_id: number;
@@ -29,14 +30,31 @@ function normalize(str: string) {
   return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
 }
 
+function shuffleAlternativas(pergunta: Pergunta) {
+  const alt = [...pergunta.alternativas];
+  const correta = pergunta.correta;
+
+  const indices = alt.map((_, i) => i);
+
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+
+  const shuffled = indices.map((i) => alt[i]);
+
+  const novaCorreta = indices.indexOf(correta);
+
+  return { alternativas: shuffled, correta: novaCorreta };
+}
+
 export default function QuizPage({ params }: { params: { slug: string } }) {
   const { slug } = params;
   const normalizedSlug = normalize(slug);
   const { user } = useAuth();
-
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
 
+  const [isLoading, setIsLoading] = useState(true);
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [perguntas, setPerguntas] = useState<Pergunta[]>([]);
   const [perguntaAtual, setPerguntaAtual] = useState(0);
@@ -47,10 +65,8 @@ export default function QuizPage({ params }: { params: { slug: string } }) {
   const [temaAtual, setTemaAtual] = useState<string>("");
   const [showResult, setShowResult] = useState(false);
   const [resultadoSalvo, setResultadoSalvo] = useState(false);
-
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Verifica autenticação
   useEffect(() => {
     const checkAuth = async () => {
       const { data, error } = await supabase.auth.getUser();
@@ -58,17 +74,13 @@ export default function QuizPage({ params }: { params: { slug: string } }) {
         router.push("/login");
         return;
       }
-
-      // pega o id direto do supabase
       setUserId(data.user.id);
       localStorage.setItem("userId", data.user.id);
-
       setIsLoading(false);
     };
     checkAuth();
   }, [router]);
 
-  // Busca quiz e perguntas
   useEffect(() => {
     if (isLoading) return;
 
@@ -87,7 +99,15 @@ export default function QuizPage({ params }: { params: { slug: string } }) {
         .eq("quiz_id", quizData.id);
 
       if (perguntasData) {
-        setPerguntas((perguntasData as Pergunta[]).sort(() => Math.random() - 0.5).slice(0, 10));
+        const perguntasEmbaralhadas = (perguntasData as Pergunta[])
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 10)
+          .map((p) => {
+            const { alternativas, correta } = shuffleAlternativas(p);
+            return { ...p, alternativas, correta };
+          });
+
+        setPerguntas(perguntasEmbaralhadas);
         setPerguntaAtual(0);
         setAcertos(0);
         setErros(0);
@@ -102,7 +122,6 @@ export default function QuizPage({ params }: { params: { slug: string } }) {
     fetchQuiz();
   }, [slug, normalizedSlug, isLoading]);
 
-  // Seleciona alternativa
   const handleSelect = (idx: number) => {
     if (selected !== null || !perguntas[perguntaAtual]) return;
     setSelected(idx);
@@ -112,16 +131,20 @@ export default function QuizPage({ params }: { params: { slug: string } }) {
     else setErros((p) => p + 1);
   };
 
-  // Vai para próxima
   const handleNext = () => {
     setSelected(null);
     setShowFeedback(false);
     setPerguntaAtual((p) => p + 1);
   };
 
-  // Reinicia quiz
   const handleRestart = () => {
-    setPerguntas(perguntas.sort(() => Math.random() - 0.5).slice(0, 10));
+    const novasPerguntas = perguntas
+      .sort(() => Math.random() - 0.5)
+      .map((p) => {
+        const { alternativas, correta } = shuffleAlternativas(p);
+        return { ...p, alternativas, correta };
+      });
+    setPerguntas(novasPerguntas);
     setPerguntaAtual(0);
     setSelected(null);
     setShowFeedback(false);
@@ -131,42 +154,40 @@ export default function QuizPage({ params }: { params: { slug: string } }) {
     setResultadoSalvo(false);
   };
 
-  // Finaliza quiz e salva no banco
   const handleFinish = async () => {
-  if (!quiz || resultadoSalvo) return;
+    if (!quiz || resultadoSalvo) return;
 
-  const pontuacao = Math.round((acertos / perguntas.length) * 100);
+    const pontuacao = Math.round((acertos / perguntas.length) * 100);
 
-  try {
-    if (userId) {
-      const username = user?.username
+    try {
+      if (userId) {
+        const username = user?.username;
 
-      const { error } = await supabase.from("QuizResultado").insert([
-        {
-          user_id: userId,
-          quiz_id: quiz.id,
-          acertos,
-          erros,
-          pontuacao,
-          username
-        },
-      ]);
+        const { error } = await supabase.from("QuizResultado").insert([
+          {
+            user_id: userId,
+            quiz_id: quiz.id,
+            acertos,
+            erros,
+            pontuacao,
+            username,
+          },
+        ]);
 
-      if (error) {
-        console.error("Erro ao salvar resultado:", error);
+        if (error) {
+          console.error("Erro ao salvar resultado:", error);
+        } else {
+          setResultadoSalvo(true);
+        }
       } else {
-        setResultadoSalvo(true);
+        console.error("Nenhum userId encontrado!");
       }
-    } else {
-      console.error("Nenhum userId encontrado!");
+    } catch (err) {
+      console.error("Erro inesperado ao finalizar quiz:", err);
     }
-  } catch (err) {
-    console.error("Erro inesperado ao finalizar quiz:", err);
-  }
 
-  setShowResult(true);
-};
-
+    setShowResult(true);
+  };
 
   if (isLoading) {
     return (
@@ -176,7 +197,6 @@ export default function QuizPage({ params }: { params: { slug: string } }) {
     );
   }
 
-  // Nenhum quiz encontrado
   if (!quiz || perguntas.length === 0) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-900 text-white">
@@ -188,7 +208,6 @@ export default function QuizPage({ params }: { params: { slug: string } }) {
     );
   }
 
-  // Resultado
   if (showResult) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-900 text-white">
@@ -206,7 +225,6 @@ export default function QuizPage({ params }: { params: { slug: string } }) {
     );
   }
 
-  // Tela de perguntas
   return (
     <div className="min-h-screen flex flex-col bg-gray-900 text-white">
       <Header />

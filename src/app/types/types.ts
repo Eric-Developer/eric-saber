@@ -4,15 +4,17 @@ export interface Quiz {
   id: number;
   titulo: string;
   materia: string;
+  tema: string;
 }
 
 export interface QuizProgresso {
   titulo: string;
   materia: string;
+  tema: string; 
   acertos: number;
   erros: number;
   ultimaPontuacao: number;
-  data: string; // ISO string da data do quiz
+  data: string; 
 }
 
 export interface AlunoProgresso {

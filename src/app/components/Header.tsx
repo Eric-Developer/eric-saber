@@ -58,7 +58,7 @@ export default function Header() {
             Painel
           </Link>
           <Link href="/profile" className="hover:text-green-400 transition font-medium">
-            Perfil
+            Profile
           </Link>
 
           {user && (
@@ -66,7 +66,7 @@ export default function Header() {
               onClick={handleLogout}
               className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-semibold transition"
             >
-              Logout
+              Sair
             </button>
           )}
         </nav>
@@ -99,7 +99,7 @@ export default function Header() {
               onClick={handleLogout}
               className="w-full bg-red-500 hover:bg-red-600 px-4 py-2 mt-2 rounded-lg font-semibold transition"
             >
-              Logout
+              Sair
             </button>
           )}
         </div>

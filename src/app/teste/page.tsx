@@ -42,7 +42,9 @@ export default function ProfessorDashboard() {
   const [ultimosQuizzes, setUltimosQuizzes] = useState<QuizResultado[]>([]);
   const [alunos, setAlunos] = useState<AlunoProgresso[]>([]);
 
-  // Aqui você poderia usar um hook de autenticação do professor se tiver
+  const [showModalCriarTurma, setShowModalCriarTurma] = useState(false);
+  const [showModalEnviarAtividade, setShowModalEnviarAtividade] = useState(false);
+
   const [user, setUser] = useState<{ username: string } | null>(null);
 
   useEffect(() => {
@@ -50,14 +52,12 @@ export default function ProfessorDashboard() {
       try {
         setLoading(true);
 
-        // 1️⃣ Buscar todos os resultados
         const { data: resultados, error: errResultados } = await supabase
           .from("QuizResultado")
           .select("*, Quiz(id, titulo, materia)");
 
         if (errResultados) throw errResultados;
 
-        // 2️⃣ Montar ranking por username
         const rankingMap: Record<string, QuizProgresso[]> = {};
         resultados?.forEach((r: QuizResultado) => {
           const uname = r.username || `ID:${r.quiz_id}`;
@@ -78,7 +78,6 @@ export default function ProfessorDashboard() {
 
         setRanking(rankingArray);
 
-        // 3️⃣ Estatísticas agregadas por matéria
         const materiaMap: Record<string, { acertos: number; erros: number }> = {};
         resultados?.forEach((r: QuizResultado) => {
           const mat = r.Quiz?.materia || "Sem matéria";
@@ -88,16 +87,10 @@ export default function ProfessorDashboard() {
         });
         setMateriaStats(materiaMap);
 
-        // 4️⃣ Últimos quizzes feitos
         const ultimos = resultados?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 10);
         setUltimosQuizzes(ultimos || []);
 
-        // 5️⃣ Lista de todos os alunos
-        const alunosArray: AlunoProgresso[] = rankingArray.map(a => ({
-          username: a.username,
-          quizzesFeitos: a.quizzesFeitos,
-        }));
-        setAlunos(alunosArray);
+        setAlunos(rankingArray);
 
       } catch (err) {
         console.error("Erro ao carregar dashboard do professor:", err);
@@ -120,7 +113,7 @@ export default function ProfessorDashboard() {
     <div className="min-h-screen bg-gray-900 p-4 sm:p-6 flex flex-col items-center">
       <Header />
 
-      {/* Estatísticas gerais */}
+      {/* Estatísticas principais */}
       <section className="mt-17 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6 w-full max-w-6xl">
         <div className="bg-gray-800 p-4 rounded-2xl shadow text-center">
           <h2 className="text-gray-300 text-sm sm:text-base">Total de Alunos</h2>
@@ -187,7 +180,7 @@ export default function ProfessorDashboard() {
                               a.quizzesFeitos.reduce((s, q) => s + q.acertos + q.erros, 1);
                 const percB = b.quizzesFeitos.reduce((s, q) => s + q.acertos, 0) /
                               b.quizzesFeitos.reduce((s, q) => s + q.acertos + q.erros, 1);
-                return percB - percA; // decrescente
+                return percB - percA;
               })
               .map((a, idx) => {
                 const totalAcertos = a.quizzesFeitos.reduce((s, q) => s + q.acertos, 0);
@@ -208,7 +201,7 @@ export default function ProfessorDashboard() {
         </table>
       </section>
 
-      {/* Últimos quizzes feitos */}
+      {/* Últimos quizzes */}
       <section className="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         {ultimosQuizzes.map((q, idx) => {
           const total = q.acertos + q.erros;
@@ -227,18 +220,78 @@ export default function ProfessorDashboard() {
         })}
       </section>
 
-      {/* Links rápidos para funcionalidades extras */}
-      <section className="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <Link href="/professor/criar-atividade" className="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-2xl text-center">
-          Criar Atividade / Quiz
-        </Link>
-        <Link href="/professor/gerenciar-alunos" className="bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-2xl text-center">
-          Gerenciar Alunos
-        </Link>
-        <Link href="/professor/editar-quiz" className="bg-yellow-500 hover:bg-yellow-600 text-white p-4 rounded-2xl text-center">
-          Editar / Adicionar Vários Quizzes
-        </Link>
+      {/* Ações do Professor */}
+      <section className="mb-6 w-full max-w-6xl">
+        <h2 className="text-xl font-bold text-white mb-4">Ações do Professor</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <button
+            onClick={() => setShowModalCriarTurma(true)}
+            className="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-2xl text-center"
+          >
+            Criar Turma
+          </button>
+          <button
+            onClick={() => setShowModalEnviarAtividade(true)}
+            className="bg-green-500 hover:bg-green-600 text-white p-4 rounded-2xl text-center"
+          >
+            Enviar Atividade
+          </button>
+          <Link
+            href="/professor/gerenciar-turmas"
+            className="bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-2xl text-center"
+          >
+            Gerenciar Turmas
+          </Link>
+          <Link
+            href="/professor/relatorios"
+            className="bg-yellow-500 hover:bg-yellow-600 text-white p-4 rounded-2xl text-center"
+          >
+            Relatórios da Turma
+          </Link>
+          <Link
+            href="/professor/rastreamento"
+            className="bg-pink-500 hover:bg-pink-600 text-white p-4 rounded-2xl text-center"
+          >
+            Rastrear Entregas
+          </Link>
+        </div>
       </section>
+
+      {/* Modais básicos */}
+      {showModalCriarTurma && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-6 rounded-2xl w-full max-w-md text-white">
+            <h3 className="text-lg font-bold mb-4">Criar Turma</h3>
+            <input type="text" placeholder="Nome da Turma" className="w-full p-2 mb-4 rounded text-black" />
+            <button
+              onClick={() => setShowModalCriarTurma(false)}
+              className="bg-blue-500 hover:bg-blue-600 p-2 rounded w-full"
+            >
+              Criar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showModalEnviarAtividade && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-6 rounded-2xl w-full max-w-md text-white">
+            <h3 className="text-lg font-bold mb-4">Enviar Atividade</h3>
+            <select className="w-full p-2 mb-4 rounded text-black">
+              <option>Selecionar Turma</option>
+            </select>
+            <select className="w-full p-2 mb-4 rounded text-black">
+              <option>Selecionar Quiz</option>
+            </select>
+            <button
+              onClick={() => setShowModalEnviarAtividade(false)}
+              className="bg-green-500 hover:bg-green-600 p-2 rounded w-full"
+            >
+              Enviar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

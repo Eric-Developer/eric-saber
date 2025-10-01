@@ -9,7 +9,7 @@ import StatsSection from "./StatsSection";
 import SubjectsProgress from "./SubjectsProgress";
 import RankingTable from "./RankingTable";
 import LastScores from "./LastScores";
-import { QuizProgresso, AlunoProgresso, QuizResultado } from "@/app/types/types";
+import { QuizProgresso, AlunoProgresso, Quiz } from "@/app/types/types";
 
 export default function AlunoDashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -20,41 +20,67 @@ export default function AlunoDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (!user?.email) return;
+        if (!user?.username) return;
 
-        // 1️⃣ Resultados do usuário atual
-        const { data: resultados, error: errResultados } = await supabase
+        // 🔹 Resultados do usuário atual
+        const { data: resultados, error } = await supabase
           .from("QuizResultado")
-          .select(`quiz_id, acertos, erros, pontuacao, created_at, Quiz(id, titulo, materia), username`)
-          .eq("user_id", user.auth_id) as { data: QuizResultado[] | null; error: Error };
-        if (errResultados) throw errResultados;
+          .select(`
+            quiz_id,
+            acertos,
+            erros,
+            pontuacao,
+            created_at,
+            Quiz(id, titulo, tema, materia)
+          `)
+          .eq("username", user.username);
 
-        const quizzesFeitos: QuizProgresso[] = resultados?.map(r => ({
-          titulo: r.Quiz[0]?.titulo || "",
-          materia: r.Quiz[0]?.materia || "",
-          acertos: r.acertos,
-          erros: r.erros,
-          ultimaPontuacao: r.pontuacao,
-          data: r.created_at || new Date().toISOString(),
-        })) || [];
+        if (error) throw error;
 
-        setProgresso({ username: user.username || user.email, quizzesFeitos });
+     const quizzesFeitos: QuizProgresso[] = resultados?.map(r => {
+  const quizObj = Array.isArray(r.Quiz) ? r.Quiz[0] : r.Quiz; // pega o objeto
+  return {
+    titulo: quizObj?.titulo || "Sem Título",
+    tema: quizObj?.tema || "Sem Tema",
+    materia: quizObj?.materia || "Sem Matéria",
+    acertos: r.acertos,
+    erros: r.erros,
+    ultimaPontuacao: r.pontuacao,
+    data: r.created_at || new Date().toISOString(),
+  };
+}) || [];
 
-        // 2️⃣ Todos os resultados
+
+        setProgresso({ username: user.username, quizzesFeitos });
+
+        // 🔹 Todos os resultados para ranking
         const { data: todosResultados, error: errRanking } = await supabase
           .from("QuizResultado")
-          .select(`quiz_id, acertos, erros, pontuacao, user_id, created_at, Quiz(id, titulo, materia), username`);
+          .select(`
+            quiz_id,
+            acertos,
+            erros,
+            pontuacao,
+            user_id,
+            created_at,
+            username,
+            Quiz(id, titulo, tema, materia)
+          `);
         if (errRanking) throw errRanking;
 
-        // 3️⃣ Montar ranking usando diretamente o username salvo
-        const rankingMap: Record<string, QuizProgresso[]> = {};
-        todosResultados?.forEach(r => {
-          const uname = r.username?.trim() || `Usuário ${r.user_id}`;
+        const todosResultadosMapeados = todosResultados?.map(r => ({
+          ...r,
+          Quiz: Array.isArray(r.Quiz) ? r.Quiz[0] : r.Quiz, 
+        })) || [];
 
+        const rankingMap: Record<string, QuizProgresso[]> = {};
+        todosResultadosMapeados.forEach(r => {
+          const uname = r.username?.trim() || `Usuário ${r.user_id}`;
           if (!rankingMap[uname]) rankingMap[uname] = [];
           rankingMap[uname].push({
-            titulo: r.Quiz[0]?.titulo || "",
-            materia: r.Quiz[0]?.materia || "",
+            titulo: r.Quiz ? r.Quiz.titulo : "Sem Título",
+            tema: r.Quiz ? r.Quiz.tema : "Sem Tema",
+            materia: r.Quiz ? r.Quiz.materia : "Sem Matéria",
             acertos: r.acertos,
             erros: r.erros,
             ultimaPontuacao: r.pontuacao,
@@ -87,7 +113,7 @@ export default function AlunoDashboard() {
       <UserCard user={user} />
       <StatsSection quizzesFeitos={progresso.quizzesFeitos} />
       <SubjectsProgress quizzesFeitos={progresso.quizzesFeitos} />
-      <RankingTable ranking={ranking} currentUser={user?.username || user?.email || ""} />
+      <RankingTable ranking={ranking} currentUser={user?.username || ""} />
       <LastScores quizzesFeitos={progresso.quizzesFeitos} />
     </div>
   );
