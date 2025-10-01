@@ -37,6 +37,12 @@ export default function UserCard({ user }: UserCardProps) {
       >
         Pesquisar Quizzes
       </Link>
+       <Link
+        href="/reading"
+        className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 w-full sm:w-auto text-center"
+      >
+        Treinar Leitura
+      </Link>
     </div>
   );
 }

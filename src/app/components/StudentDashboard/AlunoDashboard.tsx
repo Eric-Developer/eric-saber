@@ -10,6 +10,7 @@ import SubjectsProgress from "./SubjectsProgress";
 import RankingTable from "./RankingTable";
 import LastScores from "./LastScores";
 import { QuizProgresso, AlunoProgresso, Quiz } from "@/app/types/types";
+import LeituraTreino from "./LeituraTreino";
 
 export default function AlunoDashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -38,7 +39,7 @@ export default function AlunoDashboard() {
         if (error) throw error;
 
      const quizzesFeitos: QuizProgresso[] = resultados?.map(r => {
-  const quizObj = Array.isArray(r.Quiz) ? r.Quiz[0] : r.Quiz; // pega o objeto
+  const quizObj = Array.isArray(r.Quiz) ? r.Quiz[0] : r.Quiz; 
   return {
     titulo: quizObj?.titulo || "Sem Título",
     tema: quizObj?.tema || "Sem Tema",
@@ -115,6 +116,7 @@ export default function AlunoDashboard() {
       <SubjectsProgress quizzesFeitos={progresso.quizzesFeitos} />
       <RankingTable ranking={ranking} currentUser={user?.username || ""} />
       <LastScores quizzesFeitos={progresso.quizzesFeitos} />
+      <LeituraTreino/>
     </div>
   );
 }
