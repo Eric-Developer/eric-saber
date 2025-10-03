@@ -116,7 +116,6 @@ export default function AlunoDashboard() {
       <SubjectsProgress quizzesFeitos={progresso.quizzesFeitos} />
       <RankingTable ranking={ranking} currentUser={user?.username || ""} />
       <LastScores quizzesFeitos={progresso.quizzesFeitos} />
-      <LeituraTreino/>
     </div>
   );
 }

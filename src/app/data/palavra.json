@@ -1,66 +1,632 @@
 [
-  {"tipo":"palavra","texto":"casa","nivel":"fácil","categoria":"cotidiano","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"gato","nivel":"fácil","categoria":"animais","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"bola","nivel":"fácil","categoria":"brinquedo","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"sol","nivel":"fácil","categoria":"natureza","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"água","nivel":"fácil","categoria":"natureza","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"flor","nivel":"fácil","categoria":"natureza","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"menino","nivel":"fácil","categoria":"pessoas","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"menina","nivel":"fácil","categoria":"pessoas","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"livro","nivel":"fácil","categoria":"escola","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"caderno","nivel":"fácil","categoria":"escola","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"mamãe","nivel":"fácil","categoria":"pessoas","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"papai","nivel":"fácil","categoria":"pessoas","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"carro","nivel":"fácil","categoria":"cotidiano","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"pássaro","nivel":"fácil","categoria":"animais","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"rato","nivel":"fácil","categoria":"animais","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"cadeira","nivel":"fácil","categoria":"objetos","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"mesa","nivel":"fácil","categoria":"objetos","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"bola","nivel":"fácil","categoria":"brinquedo","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"sapato","nivel":"fácil","categoria":"roupa","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"boneca","nivel":"fácil","categoria":"brinquedo","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"fruta","nivel":"fácil","categoria":"comida","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"pão","nivel":"fácil","categoria":"comida","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"leite","nivel":"fácil","categoria":"comida","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"chuva","nivel":"fácil","categoria":"natureza","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"sol","nivel":"fácil","categoria":"natureza","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"lua","nivel":"fácil","categoria":"natureza","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"estrela","nivel":"fácil","categoria":"natureza","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"amigo","nivel":"fácil","categoria":"pessoas","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"escola","nivel":"fácil","categoria":"escola","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"professor","nivel":"fácil","categoria":"escola","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"janela","nivel":"fácil","categoria":"objetos","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"porta","nivel":"fácil","categoria":"objetos","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"roupa","nivel":"fácil","categoria":"roupa","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"copo","nivel":"fácil","categoria":"objetos","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"garfo","nivel":"fácil","categoria":"objetos","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"colher","nivel":"fácil","categoria":"objetos","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"quadro","nivel":"fácil","categoria":"escola","anoEstudo":"2º Ano"},
-  {"tipo":"palavra","texto":"computador","nivel":"médio","categoria":"escola","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"professora","nivel":"médio","categoria":"escola","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"livraria","nivel":"médio","categoria":"escola","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"hospital","nivel":"médio","categoria":"cotidiano","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"mercado","nivel":"médio","categoria":"cotidiano","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"ônibus","nivel":"médio","categoria":"cotidiano","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"bicicleta","nivel":"médio","categoria":"brinquedo","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"telefone","nivel":"médio","categoria":"cotidiano","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"profissão","nivel":"médio","categoria":"cotidiano","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"família","nivel":"médio","categoria":"pessoas","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"esporte","nivel":"médio","categoria":"cotidiano","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"amigável","nivel":"médio","categoria":"sentimentos","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"difícil","nivel":"médio","categoria":"conceitos","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"felicidade","nivel":"médio","categoria":"sentimentos","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"trabalhar","nivel":"médio","categoria":"verbo","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"estudar","nivel":"médio","categoria":"verbo","anoEstudo":"3º Ano"},
-  {"tipo":"palavra","texto":"construir","nivel":"difícil","categoria":"verbo","anoEstudo":"4º Ano"},
-  {"tipo":"palavra","texto":"investigar","nivel":"difícil","categoria":"verbo","anoEstudo":"4º Ano"},
-  {"tipo":"palavra","texto":"descobrir","nivel":"difícil","categoria":"verbo","anoEstudo":"4º Ano"},
-  {"tipo":"palavra","texto":"engenheiro","nivel":"difícil","categoria":"profissão","anoEstudo":"5º Ano"},
-  {"tipo":"palavra","texto":"cientista","nivel":"difícil","categoria":"profissão","anoEstudo":"5º Ano"},
-  {"tipo":"palavra","texto":"laboratório","nivel":"difícil","categoria":"lugar","anoEstudo":"5º Ano"},
-  {"tipo":"palavra","texto":"excursão","nivel":"difícil","categoria":"viagem","anoEstudo":"5º Ano"},
-  {"tipo":"palavra","texto":"observação","nivel":"difícil","categoria":"conceito","anoEstudo":"5º Ano"},
-  {"tipo":"palavra","texto":"constelação","nivel":"difícil","categoria":"natureza","anoEstudo":"5º Ano"},
-  {"tipo":"palavra","texto":"projeto","nivel":"difícil","categoria":"escola","anoEstudo":"5º Ano"},
-  {"tipo":"palavra","texto":"experimentar","nivel":"difícil","categoria":"verbo","anoEstudo":"5º Ano"}
+  {
+    "tipo": "palavra",
+    "texto": "computador",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "professora",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "livraria",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "hospital",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "mercado",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "ônibus",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "telefone",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "profissão",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "família",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "esporte",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "amigável",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "difícil",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "felicidade",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "trabalhar",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "estudar",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "construir",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "investigar",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "descobrir",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "engenheiro",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "cientista",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "laboratório",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "excursão",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "observação",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "constelação",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "projeto",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "experimentar",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "cientista",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "engenheiro",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "laboratório",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "projeto",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "investigar",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "constelação",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "experimentar",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "descobrir",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "trabalhar",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "estudar",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "felicidade",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "difícil",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "amigável",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "profissão",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "família",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "telefone",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "ônibus",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "mercado",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "hospital",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "livraria",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "professora",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "computador",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "bicicleta",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "patins",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "balão",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "bola",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "boneca",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "meia",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "saia",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "calça",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "camisa",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "sapato",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "roupa",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "prato",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "colher",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "garfo",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "copo",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "porta",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "janela",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "quadro",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "cadeira",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "mesa",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "borracha",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "lápis",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "caneta",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "livro",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "caderno",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "aluno",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "professor",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "escola",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "hospital",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "igreja",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "loja",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "mercado",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "praça",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "avenida",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "rua",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "cidade",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "praia",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "campo",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "colina",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "montanha",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "lago",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  },
+  {
+    "tipo": "palavra",
+    "texto": "rio",
+    "nivel": "fácil",
+    "categoria": "varias",
+    "anoEstudo": "2º Ano"
+  }
 ]

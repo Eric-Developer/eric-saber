@@ -37,3 +37,34 @@ export interface QuizResultado {
   user_id?: string;
   created_at?: string;
 }
+
+// app/types.ts
+export interface Quiz {
+  id: number;
+  titulo: string;
+  materia: string;
+}
+
+export interface QuizResult {
+  quiz_id: number;
+  correct: number;
+  wrong: number;
+  score: number;
+  username: string;
+  Quiz: Quiz;
+  created_at: string;
+}
+
+export interface QuizProgress {
+  title: string;
+  subject: string;
+  correct: number;
+  wrong: number;
+  lastScore: number;
+}
+
+export interface StudentProgress {
+  username: string;
+  email?: string;
+  quizzesTaken: QuizProgress[];
+}

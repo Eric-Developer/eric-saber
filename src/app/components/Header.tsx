@@ -4,11 +4,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/app/lib/supabaseClient";
 import { HiMenu, HiX } from "react-icons/hi";
-import type { User } from "@supabase/supabase-js"; 
+import type { User } from "@supabase/supabase-js";
+import Image from "next/image";
 
 export default function Header() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null); 
+  const [user, setUser] = useState<User | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -18,11 +19,9 @@ export default function Header() {
     };
     checkUser();
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
 
     return () => {
       listener.subscription.unsubscribe();
@@ -43,22 +42,46 @@ export default function Header() {
     }
   };
 
+  // 🔹 Clique na logo
+  const handleLogoClick = () => {
+    if (user) {
+      router.push("/dashboard");
+    } else {
+      router.push("/");
+    }
+  };
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-gray-800 text-white shadow-lg">
       <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-sm font-bold">
-            ES
+        <div
+          className="flex items-center gap-3 cursor-pointer"
+          onClick={handleLogoClick}
+        >
+          <div className="w-11 h-11 flex items-center justify-center">
+            <Image
+              src="/logo_aprendi+.png"
+              alt="Logo Aprendi+"
+              className="w-full h-full object-contain"
+              width={400}
+              height={400}
+            />
           </div>
-          <div className="font-semibold text-lg">EricSaber</div>
-        </Link>
+          <div className="font-semibold text-lg">Aprendi+</div>
+        </div>
 
         <nav className="hidden md:flex items-center gap-6">
-          <Link href="/dashboard" className="hover:text-green-400 transition font-medium">
+          <Link
+            href="/dashboard"
+            className="hover:text-green-400 transition font-medium"
+          >
             Painel
           </Link>
-          <Link href="/profile" className="hover:text-green-400 transition font-medium">
-            Profile
+          <Link
+            href="/profile"
+            className="hover:text-green-400 transition font-medium"
+          >
+            Perfil
           </Link>
 
           {user && (
@@ -88,7 +111,7 @@ export default function Header() {
             Painel
           </Link>
           <Link
-            href="/perfil"
+            href="/profile"
             className="block py-2 hover:text-green-400 transition font-medium"
             onClick={() => setIsOpen(false)}
           >

@@ -1,63 +1,275 @@
 [
-  {"tipo":"frase","texto":"O gato dorme na cama.","nivel":"fácil","categoria":"animais","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"A menina corre no parque.","nivel":"fácil","categoria":"cotidiano","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"O sol brilha no céu azul.","nivel":"fácil","categoria":"natureza","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"O pássaro canta de manhã.","nivel":"fácil","categoria":"animais","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"O menino brinca com a bola.","nivel":"fácil","categoria":"cotidiano","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"A flor é bonita e colorida.","nivel":"fácil","categoria":"natureza","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"O cachorro late alto.","nivel":"fácil","categoria":"animais","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"A água da chuva molha o chão.","nivel":"fácil","categoria":"natureza","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"O menino come uma maçã.","nivel":"fácil","categoria":"comida","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"A criança desenha no papel.","nivel":"fácil","categoria":"cotidiano","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"O livro está sobre a mesa.","nivel":"fácil","categoria":"escola","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"A menina sorri para a amiga.","nivel":"fácil","categoria":"cotidiano","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"O gato sobe no telhado.","nivel":"fácil","categoria":"animais","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"A abelha voa de flor em flor.","nivel":"fácil","categoria":"natureza","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"O menino lê um livro colorido.","nivel":"fácil","categoria":"escola","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"A menina desenha uma casa.","nivel":"fácil","categoria":"cotidiano","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"O cachorro brinca no quintal.","nivel":"fácil","categoria":"animais","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"O sol se põe no horizonte.","nivel":"fácil","categoria":"natureza","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"A menina toma suco de laranja.","nivel":"fácil","categoria":"comida","anoEstudo":"2º Ano"},
-  {"tipo":"frase","texto":"O menino escreve no caderno.","nivel":"fácil","categoria":"escola","anoEstudo":"2º Ano"},
-  
-  {"tipo":"frase","texto":"A professora lê um livro.","nivel":"médio","categoria":"escola","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"As crianças brincam felizes no quintal.","nivel":"médio","categoria":"cotidiano","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"O bolo de chocolate está delicioso.","nivel":"médio","categoria":"comida","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"O menino ajuda a mãe na cozinha.","nivel":"médio","categoria":"cotidiano","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"A escola organiza uma feira de ciências.","nivel":"médio","categoria":"escola","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"O cachorro está brincando com o gato.","nivel":"médio","categoria":"animais","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"A professora explica a lição de matemática.","nivel":"médio","categoria":"escola","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"As crianças plantam flores no jardim.","nivel":"médio","categoria":"natureza","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"O menino desenha um carro colorido.","nivel":"médio","categoria":"cotidiano","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"A família prepara um almoço especial.","nivel":"médio","categoria":"comida","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"O pássaro constrói um ninho na árvore.","nivel":"médio","categoria":"natureza","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"A menina organiza seus brinquedos.","nivel":"médio","categoria":"cotidiano","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"O menino escreve uma carta para o amigo.","nivel":"médio","categoria":"escola","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"A professora corrige os exercícios dos alunos.","nivel":"médio","categoria":"escola","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"O cachorro espera pelo dono na porta.","nivel":"médio","categoria":"animais","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"As crianças leem histórias antes de dormir.","nivel":"médio","categoria":"cotidiano","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"O menino come frutas no café da manhã.","nivel":"médio","categoria":"comida","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"A abelha recolhe néctar das flores.","nivel":"médio","categoria":"natureza","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"O aluno estuda para a prova de ciências.","nivel":"médio","categoria":"escola","anoEstudo":"3º Ano"},
-  {"tipo":"frase","texto":"A menina canta uma música alegre.","nivel":"médio","categoria":"cotidiano","anoEstudo":"3º Ano"},
-  
-  {"tipo":"frase","texto":"O cachorro correu atrás da bola amarela.","nivel":"difícil","categoria":"animais","anoEstudo":"4º Ano"},
-  {"tipo":"frase","texto":"Os alunos estudaram muito para a prova de matemática.","nivel":"difícil","categoria":"escola","anoEstudo":"4º Ano"},
-  {"tipo":"frase","texto":"A família viajou para a praia nas férias de verão.","nivel":"difícil","categoria":"viagem","anoEstudo":"5º Ano"},
-  {"tipo":"frase","texto":"O cientista observa o experimento atentamente.","nivel":"difícil","categoria":"escola","anoEstudo":"4º Ano"},
-  {"tipo":"frase","texto":"As crianças exploram a floresta com cuidado.","nivel":"difícil","categoria":"natureza","anoEstudo":"4º Ano"},
-  {"tipo":"frase","texto":"O médico atende os pacientes no hospital.","nivel":"difícil","categoria":"cotidiano","anoEstudo":"4º Ano"},
-  {"tipo":"frase","texto":"A família constrói uma casa na roça.","nivel":"difícil","categoria":"cotidiano","anoEstudo":"5º Ano"},
-  {"tipo":"frase","texto":"O aluno escreve um texto longo sobre sua cidade.","nivel":"difícil","categoria":"escola","anoEstudo":"4º Ano"},
-  {"tipo":"frase","texto":"As crianças observam os pássaros no parque.","nivel":"difícil","categoria":"natureza","anoEstudo":"4º Ano"},
-  {"tipo":"frase","texto":"A família planeja uma viagem ao exterior.","nivel":"difícil","categoria":"viagem","anoEstudo":"5º Ano"},
-  {"tipo":"frase","texto":"O engenheiro projeta uma ponte moderna.","nivel":"difícil","categoria":"cotidiano","anoEstudo":"5º Ano"},
-  {"tipo":"frase","texto":"Os alunos realizam uma apresentação sobre história.","nivel":"difícil","categoria":"escola","anoEstudo":"4º Ano"},
-  {"tipo":"frase","texto":"A menina investiga a vida de animais no zoológico.","nivel":"difícil","categoria":"natureza","anoEstudo":"4º Ano"},
-  {"tipo":"frase","texto":"A família organiza uma excursão escolar.","nivel":"difícil","categoria":"viagem","anoEstudo":"5º Ano"},
-  {"tipo":"frase","texto":"O menino constrói um brinquedo com peças de madeira.","nivel":"difícil","categoria":"cotidiano","anoEstudo":"4º Ano"},
-  {"tipo":"frase","texto":"Os estudantes pesquisam sobre planetas e estrelas.","nivel":"difícil","categoria":"escola","anoEstudo":"4º Ano"},
-  {"tipo":"frase","texto":"A menina fotografa flores e borboletas no jardim.","nivel":"difícil","categoria":"natureza","anoEstudo":"4º Ano"},
-  {"tipo":"frase","texto":"O aluno prepara um projeto de ciências detalhado.","nivel":"difícil","categoria":"escola","anoEstudo":"5º Ano"},
-  {"tipo":"frase","texto":"A família participa de uma viagem cultural pela cidade.","nivel":"difícil","categoria":"viagem","anoEstudo":"5º Ano"}
+  {
+    "tipo": "frase",
+    "texto": "A professora lê um livro com atenção",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "As crianças brincam felizes no quintal",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O bolo de chocolate está delicioso",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O menino ajuda a mãe na cozinha",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A escola organiza uma feira de ciências",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O cachorro está brincando com o gato",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A professora explica a lição de matemática",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "As crianças plantam flores no jardim",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O menino desenha um carro colorido",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A família prepara um almoço especial",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O pássaro constrói um ninho na árvore",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A menina organiza seus brinquedos",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O menino escreve uma carta para o amigo",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A professora corrige os exercícios dos alunos",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O cachorro espera pelo dono na porta",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "As crianças leem histórias antes de dormir",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O menino come frutas no café da manhã",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A abelha recolhe néctar das flores",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O aluno estuda para a prova de ciências",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A menina canta uma música alegre",
+    "nivel": "médio",
+    "categoria": "varias",
+    "anoEstudo": "3º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O cachorro correu atrás da bola amarela",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "Os alunos estudaram muito para a prova de matemática",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A família viajou para a praia nas férias de verão",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O cientista observa o experimento atentamente",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "As crianças exploram a floresta com cuidado",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O médico atende os pacientes no hospital",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A família constrói uma casa na roça",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O aluno escreve um texto longo sobre sua cidade",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "As crianças observam os pássaros no parque",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A família planeja uma viagem ao exterior",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O engenheiro projeta uma ponte moderna",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "Os alunos realizam uma apresentação sobre história",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A menina investiga a vida de animais no zoológico",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A família organiza uma excursão escolar",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O menino constrói um brinquedo com peças de madeira",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "Os estudantes pesquisam sobre planetas e estrelas",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A menina fotografa flores e borboletas no jardim",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "O aluno prepara um projeto de ciências detalhado",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  },
+  {
+    "tipo": "frase",
+    "texto": "A família participa de uma viagem cultural pela cidade",
+    "nivel": "difícil",
+    "categoria": "varias",
+    "anoEstudo": "4º e 5º Ano"
+  }
 ]
