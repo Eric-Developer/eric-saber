@@ -3,8 +3,6 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "@/app/lib/supabaseClient";
 import Header from "../components/Header";
 import LoadingOverlay from "../components/LoadingOverlay";
-
-// professor components
 import DashboardStats from "../components/TeacherDashboard/DashboardStats";
 import SubjectPerformance from "../components/TeacherDashboard/SubjectPerformance";
 import RankingTable from "../components/TeacherDashboard/RankingTable";
@@ -12,6 +10,7 @@ import LatestQuizzes from "../components/TeacherDashboard/LatestQuizzes";
 import TeacherActions from "../components/TeacherDashboard/TeacherActions";
 import CreateClassModal from "../components/TeacherDashboard/CreateClassModal";
 import SendActivityModal from "../components/TeacherDashboard/SendActivityModal";
+import { useAuth } from "@/app/hooks/useAuth";
 
 interface Quiz {
   id: number;
@@ -44,6 +43,8 @@ interface StudentProgress {
 }
 
 export default function ProfessorDashboard() {
+  const { user, loading: authLoading } = useAuth();
+
   const [loading, setLoading] = useState(true);
   const [ranking, setRanking] = useState<StudentProgress[]>([]);
   const [subjectStats, setSubjectStats] = useState<
@@ -51,14 +52,19 @@ export default function ProfessorDashboard() {
   >({});
   const [latestQuizzes, setLatestQuizzes] = useState<QuizResult[]>([]);
   const [students, setStudents] = useState<StudentProgress[]>([]);
-
   const [showCreateClassModal, setShowCreateClassModal] = useState(false);
   const [showSendActivityModal, setShowSendActivityModal] = useState(false);
 
+  // Aguarda o user estar carregado
   useEffect(() => {
+    if (!user) return; // não faz nada até o usuário estar disponível
+
     const fetchData = async () => {
       try {
         setLoading(true);
+        console.log("User carregado:", user);
+        console.log("User ID:", user.id);
+        console.log("User auth_id:", user.auth_id);
 
         const { data: results, error } = await supabase
           .from("QuizResultado")
@@ -66,7 +72,7 @@ export default function ProfessorDashboard() {
 
         if (error) throw error;
 
-        // Build ranking
+        // Mapear ranking por usuário
         const rankingMap: Record<string, QuizProgress[]> = {};
         results?.forEach((r: any) => {
           const uname = r.username || `ID:${r.quiz_id}`;
@@ -89,8 +95,9 @@ export default function ProfessorDashboard() {
 
         setRanking(rankingArray);
 
-        // Build subject stats
-        const subjectMap: Record<string, { correct: number; wrong: number }> = {};
+        // Mapear estatísticas por matéria
+        const subjectMap: Record<string, { correct: number; wrong: number }> =
+          {};
         results?.forEach((r: any) => {
           const subj = r.Quiz?.materia || "No subject";
           if (!subjectMap[subj]) subjectMap[subj] = { correct: 0, wrong: 0 };
@@ -99,7 +106,7 @@ export default function ProfessorDashboard() {
         });
         setSubjectStats(subjectMap);
 
-        // Latest quizzes
+        // Últimos 10 quizzes
         const latest = results
           ?.sort(
             (a, b) =>
@@ -118,9 +125,9 @@ export default function ProfessorDashboard() {
     };
 
     fetchData();
-  }, []);
+  }, [user]);
 
-  if (loading)
+  if (authLoading || !user || loading)
     return (
       <div className="min-h-screen flex items-center justify-center text-white">
         <LoadingOverlay />
@@ -153,9 +160,12 @@ export default function ProfessorDashboard() {
         onSendActivity={() => setShowSendActivityModal(true)}
       />
 
-      {/* Modals */}
+      {/* Modais */}
       {showCreateClassModal && (
-        <CreateClassModal onClose={() => setShowCreateClassModal(false)} />
+        <CreateClassModal
+          onClose={() => setShowCreateClassModal(false)}
+          professorId={user.auth_id}
+        />
       )}
       {showSendActivityModal && (
         <SendActivityModal onClose={() => setShowSendActivityModal(false)} />

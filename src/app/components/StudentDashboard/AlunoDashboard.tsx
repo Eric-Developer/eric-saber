@@ -9,8 +9,7 @@ import StatsSection from "./StatsSection";
 import SubjectsProgress from "./SubjectsProgress";
 import RankingTable from "./RankingTable";
 import LastScores from "./LastScores";
-import { QuizProgresso, AlunoProgresso, Quiz } from "@/app/types/types";
-import LeituraTreino from "./LeituraTreino";
+import { QuizProgresso, AlunoProgresso } from "@/app/types/types";
 
 export default function AlunoDashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -38,7 +37,7 @@ export default function AlunoDashboard() {
 
         if (error) throw error;
 
-     const quizzesFeitos: QuizProgresso[] = resultados?.map(r => {
+  const quizzesFeitos: QuizProgresso[] = resultados?.map(r => {
   const quizObj = Array.isArray(r.Quiz) ? r.Quiz[0] : r.Quiz; 
   return {
     titulo: quizObj?.titulo || "Sem Título",
@@ -54,7 +53,6 @@ export default function AlunoDashboard() {
 
         setProgresso({ username: user.username, quizzesFeitos });
 
-        // 🔹 Todos os resultados para ranking
         const { data: todosResultados, error: errRanking } = await supabase
           .from("QuizResultado")
           .select(`

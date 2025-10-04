@@ -1,10 +1,13 @@
+"use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { supabase } from "@/app/lib/supabaseClient";
 
 interface User {
   id: string;
   email: string;
   username?: string;
-  avatar_url?: string; // <-- adicionamos o avatar
+  avatar_url?: string;
 }
 
 interface UserCardProps {
@@ -12,6 +15,30 @@ interface UserCardProps {
 }
 
 export default function UserCard({ user }: UserCardProps) {
+  const [quizCount, setQuizCount] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchQuizCount = async () => {
+      if (!user) return;
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from("ClassStudents")
+        .select("*", { count: "exact" })
+        .eq("student_id", user.id);
+
+      if (error) {
+        console.error("Erro ao buscar quizzes do aluno:", error);
+      } else {
+        setQuizCount(data?.length || 0);
+      }
+      setLoading(false);
+    };
+
+    fetchQuizCount();
+  }, [user]);
+
   return (
     <div className="mt-17 w-full max-w-4xl flex flex-col sm:flex-row items-center justify-between bg-gray-800 text-white px-4 sm:px-6 py-4 rounded-2xl shadow-2xl mb-6 sm:mb-12 gap-4 sm:gap-0">
       <div className="flex items-center gap-4 w-full sm:w-auto">
@@ -28,21 +55,37 @@ export default function UserCard({ user }: UserCardProps) {
         )}
         <div>
           <h1 className="text-2xl font-bold truncate">{user?.username || user?.email}</h1>
-          <p className="text-gray-400 text-sm sm:text-base">Dashboard do aluno</p>
+          <p className="text-gray-400 text-sm sm:text-base">
+            Dashboard do aluno
+          </p>
+          {!loading && (
+            <p className="text-gray-300 text-sm sm:text-base">
+              Quizzes recebidos: {quizCount}
+            </p>
+          )}
         </div>
       </div>
-      <Link
-        href="/search"
-        className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 w-full sm:w-auto text-center"
-      >
-        Pesquisar Quizzes
-      </Link>
-       <Link
-        href="/reading"
-        className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 w-full sm:w-auto text-center"
-      >
-        Treinar Leitura
-      </Link>
+
+      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <Link
+          href={`/dashboard/student-quizzes/${user?.id}/`}
+          className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 w-full sm:w-auto text-center"
+        >
+          Ver Quizzes
+        </Link>
+        <Link
+          href="/search"
+          className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 w-full sm:w-auto text-center"
+        >
+          Pesquisar Quizzes
+        </Link>
+        <Link
+          href="/reading"
+          className="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 w-full sm:w-auto text-center"
+        >
+          Treinar Leitura
+        </Link>
+      </div>
     </div>
   );
 }
