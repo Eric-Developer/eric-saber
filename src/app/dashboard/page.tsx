@@ -10,14 +10,13 @@ export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  if (authLoading) return <LoadingOverlay />; // aguardando auth
+  if (authLoading) return <LoadingOverlay />; 
 
   if (!user) {
-    router.push("/login"); // redireciona se não logado
+    router.push("/login"); 
     return null;
   }
 
-  // Renderiza dashboard baseado no role/tipo do usuário
   if (user.type === "student") {
     return <AlunoDashboard />;
   } else if (user.type === "teacher") {

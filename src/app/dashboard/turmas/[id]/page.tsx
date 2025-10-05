@@ -19,7 +19,13 @@ interface Aluno {
 
 interface Quiz {
   id: string;
-  titulo: string;
+  materia: string;
+  totalPerguntas?: number; // total de perguntas dessa matéria
+}
+
+interface Pergunta {
+  id: string;
+  quiz_id: string;
 }
 
 interface Props {
@@ -34,24 +40,22 @@ export default function TurmaDetalhe({ params }: Props) {
   const [loadingAlunos, setLoadingAlunos] = useState(true);
   const [loadingQuizzes, setLoadingQuizzes] = useState(true);
   const [selectedQuizId, setSelectedQuizId] = useState<string>("");
+  const [numQuestionsToSend, setNumQuestionsToSend] = useState<number>(0);
   const [sendingQuiz, setSendingQuiz] = useState(false);
 
   const router = useRouter();
 
-  // 🔹 Verifica se o usuário está logado
+  // 🔹 Verifica usuário logado
   useEffect(() => {
     const checkUser = async () => {
       const { data } = await supabase.auth.getUser();
-      if (!data.user) {
-        router.push("/login");
-      } else {
-        setAuthLoading(false);
-      }
+      if (!data.user) router.push("/login");
+      else setAuthLoading(false);
     };
     checkUser();
   }, [router]);
 
-  // 🔹 Carrega detalhes da turma
+  // 🔹 Carrega turma
   useEffect(() => {
     const fetchTurma = async () => {
       const { data, error } = await supabase
@@ -59,12 +63,8 @@ export default function TurmaDetalhe({ params }: Props) {
         .select("*")
         .eq("id", params.id)
         .single();
-
-      if (error) {
-        console.error("Erro ao buscar turma:", error);
-      } else {
-        setTurma(data as Turma);
-      }
+      if (error) console.error("Erro ao buscar turma:", error);
+      else setTurma(data as Turma);
     };
     fetchTurma();
   }, [params.id]);
@@ -93,7 +93,6 @@ export default function TurmaDetalhe({ params }: Props) {
       }
 
       const studentIds = classStudents.map((c: any) => c.student_id);
-
       const { data: userData, error: userError } = await supabase
         .from("User")
         .select("id, username")
@@ -105,88 +104,142 @@ export default function TurmaDetalhe({ params }: Props) {
         return;
       }
 
-      const alunosMap: Aluno[] = (userData as any[]).map((u) => ({
-        id: u.id,
-        username: u.username,
-        class_id: turma.id,
-      }));
-
-      setAlunos(alunosMap);
+      setAlunos(
+        (userData as any[]).map((u) => ({
+          id: u.id,
+          username: u.username,
+          class_id: turma.id,
+        }))
+      );
       setLoadingAlunos(false);
     };
-
     fetchAlunos();
   }, [turma]);
 
-  // 🔹 Carrega quizzes disponíveis
+  // 🔹 Carrega quizzes disponíveis e total de perguntas
   useEffect(() => {
     const fetchQuizzes = async () => {
       setLoadingQuizzes(true);
-      const { data, error } = await supabase.from("Quiz").select("*");
-      if (error) {
+      const { data: quizzesData, error } = await supabase
+        .from("Quiz")
+        .select("id, materia");
+
+      if (error || !quizzesData) {
         console.error("Erro ao buscar quizzes:", error);
-      } else {
-        setQuizzes(data as Quiz[]);
+        setLoadingQuizzes(false);
+        return;
       }
+
+      const quizzesWithCount: Quiz[] = [];
+
+      for (const q of quizzesData) {
+        const { count } = await supabase
+          .from("Pergunta")
+          .select("*", { count: "exact", head: true })
+          .eq("quiz_id", q.id);
+
+        quizzesWithCount.push({ ...q, totalPerguntas: count || 0 });
+      }
+
+      setQuizzes(quizzesWithCount);
       setLoadingQuizzes(false);
     };
     fetchQuizzes();
   }, []);
 
-  // 🔹 Adicionar quiz à turma (ClassQuizzes)
+  // 🔹 Adicionar quiz à turma
   const handleAddQuiz = async () => {
     if (!selectedQuizId || !turma) {
       alert("Selecione um quiz!");
       return;
     }
 
-    const { error, data } = await supabase.from("ClassQuizzes").insert({
+    const { error } = await supabase.from("ClassQuizzes").insert({
       class_id: turma.id,
       quiz_id: selectedQuizId,
-    }).select();
+    });
 
     if (error) {
       console.error("Erro ao adicionar quiz:", error);
       alert("Erro ao adicionar quiz!");
     } else {
       alert("Quiz adicionado à turma com sucesso!");
-      setSelectedQuizId("");
-      // Atualiza lista local para mostrar imediatamente
-      setQuizzes((prev) => [...prev, quizzes.find(q => q.id === selectedQuizId)!]);
     }
   };
 
-  // 🔹 Enviar quiz para todos os alunos (cria registros na QuizAttempts)
-  const handleSendQuizToAll = async (quizId: string) => {
-    if (!quizId || !turma || alunos.length === 0) {
+  // 🔹 Função para embaralhar array
+  const shuffleArray = (array: any[]) => {
+    return array.sort(() => Math.random() - 0.5);
+  };
+
+  // 🔹 Enviar quiz para todos os alunos
+  const handleSendQuizToAll = async () => {
+    if (!selectedQuizId || !turma || alunos.length === 0) {
       alert("Selecione um quiz ou verifique se há alunos na turma.");
       return;
     }
 
     setSendingQuiz(true);
+
     try {
-      const inserts = alunos.map(a => ({
-        student_id: a.id,
-        class_id: turma.id,
-        quiz_id: quizId,
-        assigned_at: new Date().toISOString(),
-        status: "pending",
-      }));
+      // Buscar todas as perguntas do quiz
+      const { data: perguntasData, error: perguntasError } = await supabase
+        .from("Pergunta")
+        .select("*")
+        .eq("quiz_id", selectedQuizId);
 
-      const { error } = await supabase.from("quizattempts").insert(inserts);
-      if (error) throw error;
+      if (perguntasError || !perguntasData)
+        throw perguntasError || new Error("Erro ao buscar perguntas");
 
-      alert("Quiz enviado para todos os alunos da turma!");
+      // Embaralhar perguntas e limitar
+      const perguntasParaEnviar = shuffleArray(perguntasData).slice(
+        0,
+        numQuestionsToSend > 0 ? numQuestionsToSend : perguntasData.length
+      );
+
+      // Para cada aluno, criar QuizAttempt e QuizAttemptQuestions
+      for (const aluno of alunos) {
+        // 1️⃣ Criar tentativa
+        const { data: attemptData, error: attemptError } = await supabase
+          .from("quizattempts")
+          .insert({
+            student_id: aluno.id,
+            class_id: turma.id,
+            quiz_id: selectedQuizId,
+            assigned_at: new Date().toISOString(),
+            status: "pending",
+          })
+          .select("id")
+          .single();
+
+        if (attemptError) throw attemptError;
+
+        const attemptId = attemptData.id;
+
+        // 2️⃣ Criar perguntas vinculadas à tentativa
+        const questionInserts = perguntasParaEnviar.map((p) => ({
+          quiz_attempt_id: attemptId,
+          pergunta_id: p.id,
+          status: "pending",
+        }));
+
+        // ✅ Inserir perguntas
+        const { error: questionsError } = await supabase
+          .from("quizattemptquestions")
+          .insert(questionInserts);
+
+        if (questionsError) throw questionsError;
+      }
+
+      alert(
+        `Quiz enviado com ${perguntasParaEnviar.length} perguntas aleatórias para cada aluno!`
+      );
     } catch (err) {
       console.error("Erro ao enviar quiz:", err);
       alert("Erro ao enviar quiz!");
     } finally {
       setSendingQuiz(false);
     }
-  };
-
-  const handleAddAluno = () => {
-    router.push(`/dashboard/turmas/turma/${params.id}/`);
   };
 
   if (authLoading)
@@ -207,31 +260,13 @@ export default function TurmaDetalhe({ params }: Props) {
         {/* Detalhes da turma */}
         <div className="w-full max-w-4xl bg-gray-800 rounded-xl p-6 shadow-lg mb-6">
           <h1 className="text-4xl font-bold text-white mb-2">{turma.nome}</h1>
-          <p className="text-gray-300 mb-1">Matéria: {turma.materia}</p>
           <p className="text-gray-300 mb-1">Ano: {turma.ano}</p>
           <p className="text-gray-300 mb-4">Total de alunos: {alunos.length}</p>
-
-          <div className="flex gap-4 flex-wrap">
-            <button
-              onClick={() => router.push(`/turma/${turma.id}/editar`)}
-              className="px-6 py-3 rounded-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold transition"
-            >
-              Editar Turma
-            </button>
-
-            <button
-              onClick={handleAddAluno}
-              className="px-6 py-3 rounded-full bg-green-500 hover:bg-green-600 text-white font-semibold transition"
-            >
-              Adicionar Aluno
-            </button>
-          </div>
         </div>
 
         {/* Lista de alunos */}
         <div className="w-full max-w-4xl mb-6">
           <h2 className="text-2xl font-bold text-white mb-4">Alunos</h2>
-
           {loadingAlunos ? (
             <p className="text-white">Carregando alunos...</p>
           ) : alunos.length === 0 ? (
@@ -244,7 +279,6 @@ export default function TurmaDetalhe({ params }: Props) {
                   className="bg-gray-800 rounded-xl p-4 shadow-lg hover:bg-gray-700 transition flex flex-col"
                 >
                   <p className="text-white font-semibold">{aluno.username}</p>
-
                   <button
                     onClick={async () => {
                       if (confirm(`Deseja remover ${aluno.username}?`)) {
@@ -253,11 +287,8 @@ export default function TurmaDetalhe({ params }: Props) {
                           .delete()
                           .eq("student_id", aluno.id)
                           .eq("class_id", turma.id);
-                        if (error) {
-                          alert("Erro ao remover aluno");
-                        } else {
-                          setAlunos(alunos.filter((a) => a.id !== aluno.id));
-                        }
+                        if (error) alert("Erro ao remover aluno");
+                        else setAlunos(alunos.filter((a) => a.id !== aluno.id));
                       }
                     }}
                     className="mt-2 px-3 py-1 rounded-full bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition"
@@ -277,35 +308,48 @@ export default function TurmaDetalhe({ params }: Props) {
           {loadingQuizzes ? (
             <p className="text-white">Carregando quizzes...</p>
           ) : (
-           <div className="flex flex-col md:flex-row gap-4 items-center w-full">
-  <select
-    value={selectedQuizId}
-    onChange={(e) => setSelectedQuizId(e.target.value)}
-    className="px-4 py-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500 w-full md:w-auto"
-  >
-    <option value="">Selecione um quiz</option>
-    {quizzes.map((quiz) => (
-      <option key={quiz.id} value={quiz.id}>
-        {quiz.titulo}
-      </option>
-    ))}
-  </select>
+            <div className="flex flex-col md:flex-row gap-4 items-center w-full">
+              <select
+                value={selectedQuizId}
+                onChange={(e) => setSelectedQuizId(e.target.value)}
+                className="px-4 py-3 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500 w-full md:w-auto"
+              >
+                <option value="">Selecione um quiz</option>
+                {quizzes.map((quiz) => (
+                  <option key={quiz.id} value={quiz.id}>
+                    {quiz.materia} ({quiz.totalPerguntas})
+                  </option>
+                ))}
+              </select>
 
-  <button className="px-6 py-3 rounded-full bg-green-500 hover:bg-green-600 text-white font-semibold w-full md:w-auto">
-    Adicionar Quiz
-  </button>
+              <input
+                type="number"
+                min={1}
+                placeholder="Quantas perguntas enviar?"
+                value={numQuestionsToSend || ""}
+                onChange={(e) => setNumQuestionsToSend(Number(e.target.value))}
+                className="px-4 py-3 rounded-lg bg-gray-700 text-white w-full md:w-40"
+              />
 
-  <button
-    onClick={() => handleSendQuizToAll(selectedQuizId)}
-    disabled={sendingQuiz}
-    className={`px-6 py-3 rounded-full font-semibold text-white shadow-lg transition w-full md:w-auto ${
-      sendingQuiz ? "bg-gray-500 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
-    }`}
-  >
-    {sendingQuiz ? "Enviando..." : "Enviar Quiz para Todos"}
-  </button>
-</div>
+              <button
+                onClick={handleAddQuiz}
+                className="px-6 py-3 rounded-full bg-green-500 hover:bg-green-600 text-white font-semibold w-full md:w-auto"
+              >
+                Adicionar Quiz
+              </button>
 
+              <button
+                onClick={handleSendQuizToAll}
+                disabled={sendingQuiz}
+                className={`px-6 py-3 rounded-full font-semibold text-white shadow-lg transition w-full md:w-auto ${
+                  sendingQuiz
+                    ? "bg-gray-500 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600"
+                }`}
+              >
+                {sendingQuiz ? "Enviando..." : "Enviar Quiz para Todos"}
+              </button>
+            </div>
           )}
         </div>
       </main>

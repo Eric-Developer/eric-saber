@@ -1,0 +1,230 @@
+[
+  {
+    "quiz": {
+      "id": 1,
+      "titulo": "Conjunções",
+      "tema": "Português",
+      "materia": "Conjunções",
+      "anoestudo": "6º ano",
+      "tags": ["gramática", "português", "conjunções"]
+    },
+    "perguntas": [
+      {
+        "quiz_id": 1,
+        "texto": "O alce olhava seu corpo, ______ uma alcateia de lobos chegou.",
+        "alternativas": ["Pois", "Enquanto", "Porque", "Ou"],
+        "correta": 1
+      },
+      {
+        "quiz_id": 1,
+        "texto": "O alce chegou ao lago com um bando, ______ se perdeu dele quando correu para a mata.",
+        "alternativas": ["E", "Mas", "Ou", "Pois"],
+        "correta": 1
+      },
+      {
+        "quiz_id": 1,
+        "texto": "O alce precisava correr velozmente ______ seria alcançado pelos lobos.",
+        "alternativas": ["Mas", "Ou", "E", "Pois"],
+        "correta": 3
+      },
+      {
+        "quiz_id": 1,
+        "texto": "A conjunção “para” expressa a ideia de:",
+        "alternativas": ["Comparação", "Finalidade", "Tempo", "Oposição"],
+        "correta": 1
+      },
+      {
+        "quiz_id": 1,
+        "texto": "A conjunção “e” expressa a ideia de:",
+        "alternativas": ["Condição", "Adição", "Alternância", "Causa"],
+        "correta": 1
+      },
+      {
+        "quiz_id": 1,
+        "texto": "A conjunção “se” expressa a ideia de:",
+        "alternativas": ["Tempo", "Condição", "Causa", "Comparação"],
+        "correta": 2
+      },
+      {
+        "quiz_id": 1,
+        "texto": "A conjunção “enquanto” expressa a ideia de:",
+        "alternativas": ["Comparação", "Tempo", "Alternância", "Finalidade"],
+        "correta": 1
+      },
+      {
+        "quiz_id": 1,
+        "texto": "A conjunção “ou” expressa a ideia de:",
+        "alternativas": ["Alternância", "Oposição", "Causa", "Explicação"],
+        "correta": 3
+      },
+      {
+        "quiz_id": 1,
+        "texto": "A conjunção “mas” expressa a ideia de:",
+        "alternativas": ["Tempo", "Comparação", "Oposição", "Condição"],
+        "correta": 2
+      },
+      {
+        "quiz_id": 1,
+        "texto": "A conjunção “como” expressa a ideia de:",
+        "alternativas": ["Comparação", "Causa", "Adição", "Alternância"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Eu não saí de casa, ______ estava chovendo muito.",
+        "alternativas": ["porque", "mas", "ou", "enquanto"],
+        "correta": 3
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ele estudou bastante, ______ não passou na prova.",
+        "alternativas": ["mas", "e", "ou", "para"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Vou ao mercado ______ preciso comprar frutas.",
+        "alternativas": ["porque", "pois", "mas", "e"],
+        "correta": 3
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ele jogou bola, ______ eu li um livro.",
+        "alternativas": ["enquanto", "porque", "ou", "mas"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Não sei se vou ao cinema ______ fico em casa.",
+        "alternativas": ["ou", "e", "mas", "pois"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ele estuda muito, ______ quer passar de ano.",
+        "alternativas": ["porque", "mas", "e", "ou"],
+        "correta": 3
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Se chover amanhã, ______ ficaremos em casa.",
+        "alternativas": ["então", "mas", "ou", "e"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ele trouxe frutas, ______ legumes para o almoço.",
+        "alternativas": ["e", "ou", "mas", "porque"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Não estudei para a prova, ______ fiquei nervoso.",
+        "alternativas": ["por isso", "mas", "ou", "enquanto"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ela não veio, ______ estava doente.",
+        "alternativas": ["porque", "mas", "ou", "enquanto"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ele não trouxe o caderno, ______ anotou todas as tarefas.",
+        "alternativas": ["mas", "porque", "e", "ou"],
+        "correta": 2
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Vou estudar agora, ______ preciso descansar depois.",
+        "alternativas": ["mas", "e", "ou", "porque"],
+        "correta": 1
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ela gosta de estudar, ______ também pratica esportes.",
+        "alternativas": ["e", "mas", "ou", "porque"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ele não estudou, ______ passou na prova.",
+        "alternativas": ["mas", "e", "porque", "ou"],
+        "correta": 3
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ele trabalha muito, ______ não ganha bem.",
+        "alternativas": ["mas", "e", "ou", "porque"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Estudei bastante, ______ tirei nota baixa.",
+        "alternativas": ["mas", "e", "ou", "porque"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Você pode estudar agora, ______ depois do jantar.",
+        "alternativas": ["ou", "mas", "e", "porque"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Se você se esforçar, ______ conseguirá passar.",
+        "alternativas": ["então", "mas", "ou", "e"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ele não queria ir à festa, ______ foi obrigado.",
+        "alternativas": ["mas", "e", "ou", "porque"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Estudei bastante, ______ aprendi muito.",
+        "alternativas": ["e", "mas", "ou", "porque"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ele trouxe suco, ______ trouxe bolo para a festa.",
+        "alternativas": ["e", "mas", "ou", "porque"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ela quer ir à praia, ______ ao parque.",
+        "alternativas": ["ou", "e", "mas", "porque"],
+        "correta": 1
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Estava cansado, ______ continuou trabalhando.",
+        "alternativas": ["mas", "e", "ou", "porque"],
+        "correta": 3
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ele estudou, ______ passou na prova.",
+        "alternativas": ["e", "mas", "ou", "porque"],
+        "correta": 1
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Não trouxe guarda-chuva, ______ se molhou na chuva.",
+        "alternativas": ["e", "mas", "ou", "porque"],
+        "correta": 1
+      },
+      {
+        "quiz_id": 1,
+        "texto": "Ela correu rápido, ______ chegou atrasada.",
+        "alternativas": ["mas", "e", "ou", "porque"],
+        "correta": 3
+      }
+    ]
+  }
+]

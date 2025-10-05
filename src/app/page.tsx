@@ -1,9 +1,22 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/app/lib/supabaseClient"; // ajuste o caminho conforme seu projeto
 
 export default function Welcome() {
   const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data, error } = await supabase.auth.getUser();
+
+      if (!error && data.user) {
+        router.push("/dashboard");
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center px-4">

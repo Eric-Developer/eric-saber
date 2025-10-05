@@ -19,24 +19,28 @@ export default function UserCard({ user }: UserCardProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchQuizCount = async () => {
+    const fetchPendingQuizCount = async () => {
       if (!user) return;
       setLoading(true);
 
-      const { data, error } = await supabase
-        .from("ClassStudents")
-        .select("*", { count: "exact" })
-        .eq("student_id", user.id);
+      // Contar quizzes que não estão completos
+      const { count, error } = await supabase
+        .from("quizattempts")
+        .select("*", { count: "exact", head: true })
+        .eq("student_id", user.id)
+        .neq("status", "completed"); // tudo que não está completo
 
       if (error) {
         console.error("Erro ao buscar quizzes do aluno:", error);
+        setQuizCount(0);
       } else {
-        setQuizCount(data?.length || 0);
+        setQuizCount(count || 0);
       }
+
       setLoading(false);
     };
 
-    fetchQuizCount();
+    fetchPendingQuizCount();
   }, [user]);
 
   return (
@@ -55,12 +59,10 @@ export default function UserCard({ user }: UserCardProps) {
         )}
         <div>
           <h1 className="text-2xl font-bold truncate">{user?.username || user?.email}</h1>
-          <p className="text-gray-400 text-sm sm:text-base">
-            Dashboard do aluno
-          </p>
+          <p className="text-gray-400 text-sm sm:text-base">Dashboard do aluno</p>
           {!loading && (
             <p className="text-gray-300 text-sm sm:text-base">
-              Quizzes recebidos: {quizCount}
+              Quizzes pendentes: {quizCount}
             </p>
           )}
         </div>

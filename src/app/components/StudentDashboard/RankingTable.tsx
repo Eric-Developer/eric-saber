@@ -35,70 +35,74 @@ export default function RankingTable({ ranking, currentUser }: RankingTableProps
 
   const medalhas = ["🥇", "🥈", "🥉"];
 
-  const renderRanking = (rankingData: typeof ranking, title: string, mensal: boolean = false) => (
-    <section className="w-full max-w-5xl mx-auto px-4 py-6">
-      <h2 className="text-4xl font-extrabold text-center text-white mb-8 tracking-wide">
-        {mensal ? "📅 Ranking Mensal" : "🏆 Ranking Geral"}
-      </h2>
+  const renderRanking = (rankingData: typeof ranking, mensal: boolean = false) => {
+    if (!rankingData || rankingData.length === 0) return null; // ✅ não renderiza se não houver dados
 
-      <div className="flex flex-col gap-4">
-        {rankingData.map((a, idx) => {
-          const { perc, totalQuizzes, quizzesMensais } = calcularStats(a.quizzesFeitos);
-          const isCurrentUser = a.username === currentUser;
-          const medalha = idx < 3 ? medalhas[idx] : "";
+    return (
+      <section className="w-full max-w-5xl mx-auto px-4 py-6">
+        <h2 className="text-4xl font-extrabold text-center text-white mb-8 tracking-wide">
+          {mensal ? "📅 Ranking Mensal" : "🏆 Ranking Geral"}
+        </h2>
 
-          return (
-            <div
-              key={a.username}
-              className={`flex flex-col sm:flex-row items-center justify-between p-4 rounded-2xl 
-                shadow-lg transition-all transform hover:scale-[1.02] ${
-                  isCurrentUser ? "border-2 border-yellow-400 bg-gray-900" : "bg-gray-800"
-                }`}
-            >
-              {/* Posição e medalha */}
-              <div className="flex items-center gap-2 mb-2 sm:mb-0 text-white">
-                {medalha && <span className="text-3xl">{medalha}</span>}
-                <span className="font-semibold text-lg">{idx + 1}</span>
-              </div>
+        <div className="flex flex-col gap-4">
+          {rankingData.map((a, idx) => {
+            const { perc, totalQuizzes, quizzesMensais } = calcularStats(a.quizzesFeitos);
+            const isCurrentUser = a.username === currentUser;
+            const medalha = idx < 3 ? medalhas[idx] : "";
 
-              {/* Nome do aluno */}
-              <div className="flex items-center gap-2 mb-2 sm:mb-0 text-white truncate max-w-[180px]">
-                {isCurrentUser && <span className="text-blue-400 animate-bounce">👤</span>}
-                <span className="font-medium">{a.username}</span>
-              </div>
+            return (
+              <div
+                key={a.username}
+                className={`flex flex-col sm:flex-row items-center justify-between p-4 rounded-2xl 
+                  shadow-lg transition-all transform hover:scale-[1.02] ${
+                    isCurrentUser ? "border-2 border-yellow-400 bg-gray-900" : "bg-gray-800"
+                  }`}
+              >
+                {/* Posição e medalha */}
+                <div className="flex items-center gap-2 mb-2 sm:mb-0 text-white">
+                  {medalha && <span className="text-3xl">{medalha}</span>}
+                  <span className="font-semibold text-lg">{idx + 1}</span>
+                </div>
 
-              {/* Percentual médio */}
-              <div className="flex flex-col items-center mb-2 sm:mb-0 w-32">
-                <span className="text-sm font-semibold text-gray-300 mb-1">Percentual</span>
-                <span className="text-lg font-bold text-white mb-1">{perc}%</span>
-                <div className="bg-gray-700 w-full h-4 rounded-full overflow-hidden">
-                  <div
-                    className="h-4 rounded-full bg-gradient-to-r from-green-400 to-blue-500 transition-all"
-                    style={{ width: `${perc}%` }}
-                  ></div>
+                {/* Nome do aluno */}
+                <div className="flex items-center gap-2 mb-2 sm:mb-0 text-white truncate max-w-[180px]">
+                  {isCurrentUser && <span className="text-blue-400 animate-bounce">👤</span>}
+                  <span className="font-medium">{a.username}</span>
+                </div>
+
+                {/* Percentual médio */}
+                <div className="flex flex-col items-center mb-2 sm:mb-0 w-32">
+                  <span className="text-sm font-semibold text-gray-300 mb-1">Percentual</span>
+                  <span className="text-lg font-bold text-white mb-1">{perc}%</span>
+                  <div className="bg-gray-700 w-full h-4 rounded-full overflow-hidden">
+                    <div
+                      className="h-4 rounded-full bg-gradient-to-r from-green-400 to-blue-500 transition-all"
+                      style={{ width: `${perc}%` }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Total de quizzes */}
+                <div className="flex flex-col items-center mb-2 sm:mb-0 w-32">
+                  <span className="text-sm font-semibold text-gray-300 mb-1">
+                    Quizzes {mensal ? "Mensais" : "Totais"}
+                  </span>
+                  <span className="text-lg font-bold text-white">
+                    {mensal ? quizzesMensais : totalQuizzes}
+                  </span>
                 </div>
               </div>
-
-              {/* Total de quizzes */}
-              <div className="flex flex-col items-center mb-2 sm:mb-0 w-32">
-                <span className="text-sm font-semibold text-gray-300 mb-1">
-                  Quizzes {mensal ? "Mensais" : "Totais"}
-                </span>
-                <span className="text-lg font-bold text-white">
-                  {mensal ? quizzesMensais : totalQuizzes}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
+            );
+          })}
+        </div>
+      </section>
+    );
+  };
 
   return (
     <>
-      {renderRanking(geralRanking, "🏆 Ranking Geral")}
-      {renderRanking(mensalRanking, "📅 Ranking Mensal", true)}
+      {renderRanking(geralRanking)}
+      {renderRanking(mensalRanking, true)}
     </>
   );
 }

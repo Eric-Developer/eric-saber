@@ -40,7 +40,7 @@ export default function StudentQuizPage() {
   const [showResult, setShowResult] = useState(false);
   const [acertos, setAcertos] = useState(0);
   const [erros, setErros] = useState(0);
-  const [pontuacao, setPontuacao] = useState(0); // ✅ Estado de pontuação
+  const [pontuacao, setPontuacao] = useState(0);
 
   // 🔹 Busca attempt
   useEffect(() => {
@@ -65,35 +65,56 @@ export default function StudentQuizPage() {
     fetchAttempt();
   }, [attemptId, user, router]);
 
-  // 🔹 Busca quiz e perguntas
+  // 🔹 Busca quiz e perguntas atribuídas ao attempt
   useEffect(() => {
     if (!attempt) return;
 
-    const fetchQuiz = async () => {
-      const { data: quizData, error: quizError } = await supabase
-        .from("Quiz")
-        .select("*")
-        .eq("id", attempt.quiz_id)
-        .single();
+    const fetchQuizAndPerguntas = async () => {
+      try {
+        // Busca quiz
+        const { data: quizData, error: quizError } = await supabase
+          .from("Quiz")
+          .select("*")
+          .eq("id", attempt.quiz_id)
+          .single();
 
-      if (quizError || !quizData) {
-        alert("Quiz não encontrado.");
-        router.push("/dashboard");
-        return;
+        if (quizError || !quizData) {
+          alert("Quiz não encontrado.");
+          router.push("/dashboard");
+          return;
+        }
+
+        setQuiz(quizData as Quiz);
+
+        // Busca perguntas atribuídas ao attempt
+        const { data: perguntasData, error: perguntasError } = await supabase
+          .from("quizattemptquestions")
+          .select(`
+            pergunta_id,
+            pergunta: Pergunta (
+              id,
+              quiz_id,
+              texto,
+              alternativas,
+              correta
+            )
+          `)
+          .eq("quiz_attempt_id", attempt.id);
+
+        if (perguntasError || !perguntasData) throw perguntasError || new Error("Erro ao buscar perguntas");
+
+        // Mapeia para o formato Pergunta[]
+        const perguntasDoAttempt = perguntasData.map((q: any) => q.pergunta);
+        setPerguntas(perguntasDoAttempt);
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Erro ao carregar quiz e perguntas:", err);
+        alert("Erro ao carregar quiz.");
       }
-
-      setQuiz(quizData as Quiz);
-
-      const { data: perguntasData } = await supabase
-        .from("Pergunta")
-        .select("*")
-        .eq("quiz_id", quizData.id);
-
-      setPerguntas(perguntasData as Pergunta[]);
-      setLoading(false);
     };
 
-    fetchQuiz();
+    fetchQuizAndPerguntas();
   }, [attempt, router]);
 
   const handleSelect = (idx: number) => {
@@ -114,14 +135,15 @@ export default function StudentQuizPage() {
   };
 
   const handleFinish = async () => {
-    if (!quiz || !user?.id) return;
+    if (!quiz || !user?.id || !attempt) return;
 
     const calcPontuacao = Math.round((acertos / perguntas.length) * 100);
     setPontuacao(calcPontuacao);
 
     try {
+      // Salva resultado do quiz
       const { error } = await supabase.from("QuizResultado").insert([{
-        quiz_id: attempt?.quiz_id,
+        quiz_id: attempt.quiz_id,
         user_id: user.auth_id,
         username: user.username,
         acertos,
@@ -129,17 +151,14 @@ export default function StudentQuizPage() {
         pontuacao: calcPontuacao,
         created_at: new Date().toISOString()
       }]);
-
       if (error) console.error("Erro ao salvar resultado:", error);
-      else console.log("Resultado salvo com sucesso!");
 
       // Atualiza status do attempt
-      if (attempt && attempt.status !== "completed") {
+      if (attempt.status !== "completed") {
         const { error: attemptError } = await supabase
           .from("quizattempts")
           .update({ status: "completed" })
           .eq("id", attempt.id);
-
         if (attemptError) console.error("Erro ao marcar quiz como completo:", attemptError);
         else setAttempt({ ...attempt, status: "completed" });
       }
@@ -164,13 +183,12 @@ export default function StudentQuizPage() {
       <div className="min-h-screen flex flex-col bg-gray-900 text-white">
         <Header />
         <div className="flex flex-1 items-center justify-center text-center">
-          Quiz não encontrado ou sem perguntas.
+          Quiz não encontrado ou sem perguntas atribuídas.
         </div>
       </div>
     );
   }
 
-  // 🔹 Tela de resultados
   if (showResult) {
     return (
       <div className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-white px-4">

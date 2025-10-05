@@ -22,7 +22,6 @@ export default function AlunoDashboard() {
       try {
         if (!user?.username) return;
 
-        // 🔹 Resultados do usuário atual
         const { data: resultados, error } = await supabase
           .from("QuizResultado")
           .select(`
@@ -37,18 +36,18 @@ export default function AlunoDashboard() {
 
         if (error) throw error;
 
-  const quizzesFeitos: QuizProgresso[] = resultados?.map(r => {
-  const quizObj = Array.isArray(r.Quiz) ? r.Quiz[0] : r.Quiz; 
-  return {
-    titulo: quizObj?.titulo || "Sem Título",
-    tema: quizObj?.tema || "Sem Tema",
-    materia: quizObj?.materia || "Sem Matéria",
-    acertos: r.acertos,
-    erros: r.erros,
-    ultimaPontuacao: r.pontuacao,
-    data: r.created_at || new Date().toISOString(),
-  };
-}) || [];
+          const quizzesFeitos: QuizProgresso[] = resultados?.map(r => {
+          const quizObj = Array.isArray(r.Quiz) ? r.Quiz[0] : r.Quiz; 
+          return {
+            titulo: quizObj?.titulo || "Sem Título",
+            tema: quizObj?.tema || "Sem Tema",
+            materia: quizObj?.materia || "Sem Matéria",
+            acertos: r.acertos,
+            erros: r.erros,
+            ultimaPontuacao: r.pontuacao,
+            data: r.created_at || new Date().toISOString(),
+          };
+        }) || [];
 
 
         setProgresso({ username: user.username, quizzesFeitos });
@@ -113,7 +112,7 @@ export default function AlunoDashboard() {
       <StatsSection quizzesFeitos={progresso.quizzesFeitos} />
       <SubjectsProgress quizzesFeitos={progresso.quizzesFeitos} />
       <LastScores quizzesFeitos={progresso.quizzesFeitos} />
-        <RankingTable ranking={ranking} currentUser={user?.username || ""} />
+      <RankingTable ranking={ranking} currentUser={user?.username || ""} />
         
     </div>
   );
