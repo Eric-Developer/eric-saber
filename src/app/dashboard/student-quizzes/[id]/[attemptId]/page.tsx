@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/app/lib/supabaseClient";
 import Header from "@/app/components/Header";
+import { useAuth } from "@/app/hooks/useAuth";
 
 interface Pergunta {
   id: number;
@@ -26,8 +27,9 @@ interface Quiz {
 }
 
 export default function StudentQuizPage() {
-  const { attemptId, id: studentId } = useParams();
+  const { attemptId } = useParams();
   const router = useRouter();
+  const { user } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [attempt, setAttempt] = useState<QuizAttempt | null>(null);
@@ -38,15 +40,18 @@ export default function StudentQuizPage() {
   const [showResult, setShowResult] = useState(false);
   const [acertos, setAcertos] = useState(0);
   const [erros, setErros] = useState(0);
+  const [pontuacao, setPontuacao] = useState(0); // ✅ Estado de pontuação
 
-  // 🔹 Verifica se o attempt existe e pertence ao aluno
+  // 🔹 Busca attempt
   useEffect(() => {
+    if (!user?.id) return;
+
     const fetchAttempt = async () => {
       const { data, error } = await supabase
         .from("quizattempts")
         .select("*")
         .eq("id", attemptId)
-        .eq("student_id", studentId)
+        .eq("student_id", user.id)
         .single();
 
       if (error || !data) {
@@ -54,12 +59,11 @@ export default function StudentQuizPage() {
         router.push("/dashboard");
         return;
       }
-
       setAttempt(data as QuizAttempt);
     };
 
     fetchAttempt();
-  }, [attemptId, studentId, router]);
+  }, [attemptId, user, router]);
 
   // 🔹 Busca quiz e perguntas
   useEffect(() => {
@@ -101,23 +105,50 @@ export default function StudentQuizPage() {
   };
 
   const handleNext = async () => {
-    setSelected(null);
-
     if (currentQuestion + 1 >= perguntas.length) {
-      setShowResult(true);
+      await handleFinish();
+    } else {
+      setCurrentQuestion((q) => q + 1);
+      setSelected(null);
+    }
+  };
 
+  const handleFinish = async () => {
+    if (!quiz || !user?.id) return;
+
+    const calcPontuacao = Math.round((acertos / perguntas.length) * 100);
+    setPontuacao(calcPontuacao);
+
+    try {
+      const { error } = await supabase.from("QuizResultado").insert([{
+        quiz_id: attempt?.quiz_id,
+        user_id: user.auth_id,
+        username: user.username,
+        acertos,
+        erros,
+        pontuacao: calcPontuacao,
+        created_at: new Date().toISOString()
+      }]);
+
+      if (error) console.error("Erro ao salvar resultado:", error);
+      else console.log("Resultado salvo com sucesso!");
+
+      // Atualiza status do attempt
       if (attempt && attempt.status !== "completed") {
-        const { error } = await supabase
+        const { error: attemptError } = await supabase
           .from("quizattempts")
           .update({ status: "completed" })
           .eq("id", attempt.id);
 
-        if (error) console.error("Erro ao marcar quiz como completo:", error);
+        if (attemptError) console.error("Erro ao marcar quiz como completo:", attemptError);
         else setAttempt({ ...attempt, status: "completed" });
       }
-    } else {
-      setCurrentQuestion((q) => q + 1);
+
+    } catch (err) {
+      console.error("Erro inesperado ao finalizar quiz:", err);
     }
+
+    setShowResult(true);
   };
 
   if (loading) {
@@ -139,19 +170,29 @@ export default function StudentQuizPage() {
     );
   }
 
+  // 🔹 Tela de resultados
   if (showResult) {
     return (
-      <div className="min-h-screen flex flex-col bg-gray-900 text-white items-center pt-20">
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-white px-4">
         <Header />
-        <h1 className="text-3xl font-bold mb-4">{quiz.titulo}</h1>
-        <p className="text-lg">Acertos: {acertos}</p>
-        <p className="text-lg">Erros: {erros}</p>
-        <button
-          onClick={() => router.push("/dashboard")}
-          className="mt-4 px-6 py-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-semibold"
-        >
-          Voltar ao Dashboard
-        </button>
+        <div className="bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+          <h1 className="text-3xl font-bold mb-6">{quiz.titulo}</h1>
+          <p className="text-lg mb-2">
+            Acertos: <span className="font-semibold text-green-400">{acertos}</span>
+          </p>
+          <p className="text-lg mb-2">
+            Erros: <span className="font-semibold text-red-400">{erros}</span>
+          </p>
+          <p className="text-lg mb-6">
+            Pontuação: <span className="font-semibold text-blue-400">{pontuacao}%</span>
+          </p>
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="mt-4 px-6 py-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-semibold w-full"
+          >
+            Voltar ao Dashboard
+          </button>
+        </div>
       </div>
     );
   }
@@ -160,47 +201,41 @@ export default function StudentQuizPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-900 text-white items-center justify-center pt-20 px-4">
-  <Header />
-
-  <div className="bg-gray-800 rounded-xl p-6 shadow-lg max-w-2xl w-full mx-auto">
-    <h2 className="text-2xl font-bold mb-4 text-center">{quiz.titulo}</h2>
-    <p className="mb-4 text-center">
-      Pergunta {currentQuestion + 1} de {perguntas.length}
-    </p>
-    <p className="mb-6 text-center">{pergunta.texto}</p>
-
-    <div className="flex flex-col gap-3 w-full">
-      {pergunta.alternativas.map((alt, idx) => (
-        <button
-          key={idx}
-          onClick={() => handleSelect(idx)}
-          className={`px-4 py-2 rounded-lg w-full ${
-            selected === null
-              ? "bg-gray-700 hover:bg-gray-600"
-              : idx === pergunta.correta
-              ? "bg-green-500"
-              : idx === selected
-              ? "bg-red-500"
-              : "bg-gray-700"
-          } text-white font-semibold`}
-        >
-          {alt}
-        </button>
-      ))}
+      <Header />
+      <div className="bg-gray-800 rounded-xl p-6 shadow-lg max-w-2xl w-full mx-auto">
+        <h2 className="text-2xl font-bold mb-4 text-center">{quiz.titulo}</h2>
+        <p className="mb-4 text-center">
+          Pergunta {currentQuestion + 1} de {perguntas.length}
+        </p>
+        <p className="mb-6 text-center">{pergunta.texto}</p>
+        <div className="flex flex-col gap-3 w-full">
+          {pergunta.alternativas.map((alt, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleSelect(idx)}
+              className={`px-4 py-2 rounded-lg w-full ${
+                selected === null
+                  ? "bg-gray-700 hover:bg-gray-600"
+                  : idx === pergunta.correta
+                  ? "bg-green-500"
+                  : idx === selected
+                  ? "bg-red-500"
+                  : "bg-gray-700"
+              } text-white font-semibold`}
+            >
+              {alt}
+            </button>
+          ))}
+        </div>
+        {selected !== null && (
+          <button
+            onClick={handleNext}
+            className="mt-4 px-6 py-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-semibold w-full"
+          >
+            {currentQuestion + 1 === perguntas.length ? "Finalizar Quiz" : "Próxima"}
+          </button>
+        )}
+      </div>
     </div>
-
-    {selected !== null && (
-      <button
-        onClick={handleNext}
-        className="mt-4 px-6 py-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-semibold w-full"
-      >
-        {currentQuestion + 1 === perguntas.length
-          ? "Finalizar Quiz"
-          : "Próxima"}
-      </button>
-    )}
-  </div>
-</div>
-
   );
 }

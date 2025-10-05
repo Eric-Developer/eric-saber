@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { AlunoProgresso } from "@/app/types/types";
 
@@ -7,74 +8,97 @@ interface RankingTableProps {
 }
 
 export default function RankingTable({ ranking, currentUser }: RankingTableProps) {
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
-
-  const calcularStats = (quizzes: typeof ranking[0]["quizzesFeitos"]) => {
+  const calcularStats = (
+    quizzes: { acertos: number; erros: number; data: string }[]
+  ) => {
     const acertos = quizzes.reduce((sum, q) => sum + q.acertos, 0);
     const erros = quizzes.reduce((sum, q) => sum + q.erros, 0);
-    const perc = acertos + erros > 0 ? Math.round((acertos / (acertos + erros)) * 100) : 0;
-    return { acertos, erros, perc, totalQuizzes: quizzes.length };
+    const perc =
+      acertos + erros > 0 ? Math.round((acertos / (acertos + erros)) * 100) : 0;
+
+    const hoje = new Date();
+    const quizzesMensais = quizzes.filter(q => {
+      const d = new Date(q.data);
+      return d.getMonth() === hoje.getMonth() && d.getFullYear() === hoje.getFullYear();
+    });
+
+    return { perc, totalQuizzes: quizzes.length, quizzesMensais: quizzesMensais.length, quizzesMensaisArray: quizzesMensais };
   };
 
-  const filterWithQuizzes = (alunos: AlunoProgresso[], mensal = false) =>
-    alunos
-      .map((a) => {
-        const quizzes = mensal
-          ? a.quizzesFeitos.filter((q) => {
-              const data = new Date(q.data);
-              return data.getMonth() === currentMonth && data.getFullYear() === currentYear;
-            })
-          : a.quizzesFeitos;
-        return { ...a, quizzes };
-      })
-      .filter((a) => a.quizzes.length > 0);
+  const geralRanking = ranking
+    .filter(a => a.quizzesFeitos && a.quizzesFeitos.length > 0)
+    .sort((a, b) => calcularStats(b.quizzesFeitos).perc - calcularStats(a.quizzesFeitos).perc);
 
-  const geralRanking = filterWithQuizzes(ranking).sort((a, b) => calcularStats(b.quizzes).perc - calcularStats(a.quizzes).perc);
-  const mensalRanking = filterWithQuizzes(ranking, true).sort((a, b) => calcularStats(b.quizzes).perc - calcularStats(a.quizzes).perc);
+  const mensalRanking = ranking
+    .filter(a => a.quizzesFeitos && calcularStats(a.quizzesFeitos).quizzesMensais > 0)
+    .sort((a, b) => calcularStats(b.quizzesFeitos).perc - calcularStats(a.quizzesFeitos).perc);
 
-  const renderRanking = (rank: typeof ranking, title: string) => {
-    if (rank.length === 0) return null; // Se não houver ninguém, não mostra nada
+  const medalhas = ["🥇", "🥈", "🥉"];
 
-    return (
-      <section className="mb-6 w-full max-w-4xl overflow-x-auto">
-        <h2 className="text-xl font-bold text-white mb-4">{title}</h2>
-        <table className="w-full text-left text-white min-w-[500px] sm:min-w-full">
-          <thead>
-            <tr className="border-b border-gray-600">
-              <th className="py-2 px-2">#</th>
-              <th className="py-2 px-2">Aluno</th>
-              <th className="py-2 px-2">Percentual Médio</th>
-              <th className="py-2 px-2">Quizzes Feitos</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rank.map((a, idx) => {
-              const { perc, totalQuizzes } = calcularStats(a.quizzesFeitos);
+  const renderRanking = (rankingData: typeof ranking, title: string, mensal: boolean = false) => (
+    <section className="w-full max-w-5xl mx-auto px-4 py-6">
+      <h2 className="text-4xl font-extrabold text-center text-white mb-8 tracking-wide">
+        {mensal ? "📅 Ranking Mensal" : "🏆 Ranking Geral"}
+      </h2>
 
-              return (
-                <tr
-                  key={a.username}
-                  className={a.username === currentUser ? "bg-gray-700" : ""}
-                >
-                  <td className="py-2 px-2">{idx + 1}</td>
-                  <td className="py-2 px-2 truncate max-w-[150px]">{a.username}</td>
-                  <td className="py-2 px-2">{perc}%</td>
-                  <td className="py-2 px-2">{totalQuizzes}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </section>
-    );
-  };
+      <div className="flex flex-col gap-4">
+        {rankingData.map((a, idx) => {
+          const { perc, totalQuizzes, quizzesMensais } = calcularStats(a.quizzesFeitos);
+          const isCurrentUser = a.username === currentUser;
+          const medalha = idx < 3 ? medalhas[idx] : "";
+
+          return (
+            <div
+              key={a.username}
+              className={`flex flex-col sm:flex-row items-center justify-between p-4 rounded-2xl 
+                shadow-lg transition-all transform hover:scale-[1.02] ${
+                  isCurrentUser ? "border-2 border-yellow-400 bg-gray-900" : "bg-gray-800"
+                }`}
+            >
+              {/* Posição e medalha */}
+              <div className="flex items-center gap-2 mb-2 sm:mb-0 text-white">
+                {medalha && <span className="text-3xl">{medalha}</span>}
+                <span className="font-semibold text-lg">{idx + 1}</span>
+              </div>
+
+              {/* Nome do aluno */}
+              <div className="flex items-center gap-2 mb-2 sm:mb-0 text-white truncate max-w-[180px]">
+                {isCurrentUser && <span className="text-blue-400 animate-bounce">👤</span>}
+                <span className="font-medium">{a.username}</span>
+              </div>
+
+              {/* Percentual médio */}
+              <div className="flex flex-col items-center mb-2 sm:mb-0 w-32">
+                <span className="text-sm font-semibold text-gray-300 mb-1">Percentual</span>
+                <span className="text-lg font-bold text-white mb-1">{perc}%</span>
+                <div className="bg-gray-700 w-full h-4 rounded-full overflow-hidden">
+                  <div
+                    className="h-4 rounded-full bg-gradient-to-r from-green-400 to-blue-500 transition-all"
+                    style={{ width: `${perc}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Total de quizzes */}
+              <div className="flex flex-col items-center mb-2 sm:mb-0 w-32">
+                <span className="text-sm font-semibold text-gray-300 mb-1">
+                  Quizzes {mensal ? "Mensais" : "Totais"}
+                </span>
+                <span className="text-lg font-bold text-white">
+                  {mensal ? quizzesMensais : totalQuizzes}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
 
   return (
     <>
-      {renderRanking(geralRanking, "Ranking Geral")}
-      {renderRanking(mensalRanking, "Ranking Mensal")}
+      {renderRanking(geralRanking, "🏆 Ranking Geral")}
+      {renderRanking(mensalRanking, "📅 Ranking Mensal", true)}
     </>
   );
 }
