@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/app/lib/supabaseClient"; // ajuste o caminho conforme seu projeto
+import { supabase } from "@/app/lib/supabaseClient"; 
 
 export default function Welcome() {
   const router = useRouter();
@@ -20,7 +20,6 @@ export default function Welcome() {
 
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center px-4">
-      {/* Título principal */}
       <h1 className="text-5xl md:text-6xl font-extrabold text-white text-center mb-6">
         Bem-vindo ao EricSaber!
       </h1>

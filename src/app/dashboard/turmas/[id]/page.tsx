@@ -116,7 +116,6 @@ export default function TurmaDetalhe({ params }: Props) {
     fetchAlunos();
   }, [turma]);
 
-  // 🔹 Carrega quizzes disponíveis e total de perguntas
   useEffect(() => {
     const fetchQuizzes = async () => {
       setLoadingQuizzes(true);
@@ -252,6 +251,9 @@ export default function TurmaDetalhe({ params }: Props) {
   if (!turma)
     return <p className="text-white text-center mt-20">Turma não encontrada.</p>;
 
+   const handleAddAluno = () => {
+    router.push(`/dashboard/turmas/turma/${params.id}/`);
+  };
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col">
       <Header />
@@ -331,12 +333,12 @@ export default function TurmaDetalhe({ params }: Props) {
                 className="px-4 py-3 rounded-lg bg-gray-700 text-white w-full md:w-40"
               />
 
-              <button
-                onClick={handleAddQuiz}
-                className="px-6 py-3 rounded-full bg-green-500 hover:bg-green-600 text-white font-semibold w-full md:w-auto"
-              >
-                Adicionar Quiz
-              </button>
+            <button
+              onClick={handleAddAluno}
+              className="px-6 py-3 rounded-full bg-green-500 hover:bg-green-600 text-white font-semibold transition"
+            >
+              Adicionar Aluno              Adicionar Aluno
+            </button>
 
               <button
                 onClick={handleSendQuizToAll}

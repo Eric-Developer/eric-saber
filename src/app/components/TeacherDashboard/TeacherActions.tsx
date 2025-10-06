@@ -15,7 +15,7 @@ export default function TeacherActions({ onCreateClass, onSendActivity }: Props)
           onClick={onCreateClass}
           className="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-2xl text-center"
         >
-          Create Class
+          Criar Turma
         </button>
         <button
           onClick={onSendActivity}
@@ -24,10 +24,10 @@ export default function TeacherActions({ onCreateClass, onSendActivity }: Props)
           Send Activity
         </button>
         <Link
-          href="/professor/manage-classes"
+          href="/dashboard/turmas"
           className="bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-2xl text-center"
         >
-          Manage Classes
+          Turmas
         </Link>
         <Link
           href="/professor/reports"

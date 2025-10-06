@@ -41,6 +41,7 @@ export default function StudentQuizPage() {
   const [acertos, setAcertos] = useState(0);
   const [erros, setErros] = useState(0);
   const [pontuacao, setPontuacao] = useState(0);
+const [isFinishing, setIsFinishing] = useState(false);
 
   // 🔹 Busca attempt
   useEffect(() => {
@@ -135,41 +136,43 @@ export default function StudentQuizPage() {
   };
 
   const handleFinish = async () => {
-    if (!quiz || !user?.id || !attempt) return;
+  if (isFinishing || !quiz || !user?.id || !attempt) return;
+  setIsFinishing(true); // impede cliques repetidos
 
-    const calcPontuacao = Math.round((acertos / perguntas.length) * 100);
-    setPontuacao(calcPontuacao);
+  const calcPontuacao = Math.round((acertos / perguntas.length) * 100);
+  setPontuacao(calcPontuacao);
 
-    try {
-      // Salva resultado do quiz
-      const { error } = await supabase.from("QuizResultado").insert([{
-        quiz_id: attempt.quiz_id,
-        user_id: user.auth_id,
-        username: user.username,
-        acertos,
-        erros,
-        pontuacao: calcPontuacao,
-        created_at: new Date().toISOString()
-      }]);
-      if (error) console.error("Erro ao salvar resultado:", error);
+  try {
+    // Salva resultado do quiz
+    const { error } = await supabase.from("QuizResultado").insert([{
+      quiz_id: attempt.quiz_id,
+      user_id: user.auth_id,
+      username: user.username,
+      acertos,
+      erros,
+      pontuacao: calcPontuacao,
+      created_at: new Date().toISOString()
+    }]);
+    if (error) console.error("Erro ao salvar resultado:", error);
 
-      // Atualiza status do attempt
-      if (attempt.status !== "completed") {
-        const { error: attemptError } = await supabase
-          .from("quizattempts")
-          .update({ status: "completed" })
-          .eq("id", attempt.id);
-        if (attemptError) console.error("Erro ao marcar quiz como completo:", attemptError);
-        else setAttempt({ ...attempt, status: "completed" });
-      }
-
-    } catch (err) {
-      console.error("Erro inesperado ao finalizar quiz:", err);
+    // Atualiza status do attempt
+    if (attempt.status !== "completed") {
+      const { error: attemptError } = await supabase
+        .from("quizattempts")
+        .update({ status: "completed" })
+        .eq("id", attempt.id);
+      if (attemptError) console.error("Erro ao marcar quiz como completo:", attemptError);
+      else setAttempt({ ...attempt, status: "completed" });
     }
+  } catch (err) {
+    console.error("Erro inesperado ao finalizar quiz:", err);
+  }
 
-    setShowResult(true);
-  };
+  setShowResult(true);
+  setIsFinishing(false); 
+};
 
+  
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white bg-gray-900">
@@ -246,12 +249,16 @@ export default function StudentQuizPage() {
           ))}
         </div>
         {selected !== null && (
-          <button
-            onClick={handleNext}
-            className="mt-4 px-6 py-3 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-semibold w-full"
-          >
-            {currentQuestion + 1 === perguntas.length ? "Finalizar Quiz" : "Próxima"}
-          </button>
+        <button
+  onClick={handleNext}
+  disabled={isFinishing}
+  className={`mt-4 px-6 py-3 rounded-full font-semibold w-full ${
+    isFinishing ? "bg-gray-600 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600 text-white"
+  }`}
+>
+  {isFinishing ? "Finalizando..." : currentQuestion + 1 === perguntas.length ? "Finalizar Quiz" : "Próxima"}
+</button>
+
         )}
       </div>
     </div>
