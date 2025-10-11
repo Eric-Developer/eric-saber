@@ -45,7 +45,6 @@ export default function TurmaDetalhe({ params }: Props) {
 
   const router = useRouter();
 
-  // 🔹 Verifica usuário logado
   useEffect(() => {
     const checkUser = async () => {
       const { data } = await supabase.auth.getUser();
@@ -55,7 +54,6 @@ export default function TurmaDetalhe({ params }: Props) {
     checkUser();
   }, [router]);
 
-  // 🔹 Carrega turma
   useEffect(() => {
     const fetchTurma = async () => {
       const { data, error } = await supabase
@@ -337,7 +335,7 @@ export default function TurmaDetalhe({ params }: Props) {
               onClick={handleAddAluno}
               className="px-6 py-3 rounded-full bg-green-500 hover:bg-green-600 text-white font-semibold transition"
             >
-              Adicionar Aluno              Adicionar Aluno
+              Adicionar Aluno       
             </button>
 
               <button

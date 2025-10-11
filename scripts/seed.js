@@ -1,7 +1,7 @@
 // scripts/seed.js
 
 const { supabase } = require("../src/app/lib/supabse");
-const questionsJson = require("../src/app/data/portugues/conjuncoes.json");
+const questionsJson = require("../src/app/data//geografia/meios_de_transporte_e_fontes_de_energia.json");
 
 async function seed() {
   if (!Array.isArray(questionsJson)) {

@@ -9,12 +9,12 @@ interface Quiz {
   quiz_id: string; // id do quiz
   assigned_at: string;
   due_date: string | null;
-  status: string; 
-  quiz_name: string; 
+  status: string;
+  quiz_name: string;
 }
 
 export default function AlunoQuizzes() {
-  const params = useParams(); 
+  const params = useParams();
   const router = useRouter();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +45,7 @@ export default function AlunoQuizzes() {
           assigned_at: q.assigned_at,
           due_date: q.due_date,
           status: q.status,
-          quiz_name: q.Quiz.titulo, 
+          quiz_name: q.Quiz.titulo,
         }));
 
         setQuizzes(mappedQuizzes);
@@ -59,43 +59,56 @@ export default function AlunoQuizzes() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white">
+      <div className="min-h-screen flex items-center justify-center text-white bg-gray-900">
         Carregando quizzes...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center px-4 pt-20">
+    <div className="min-h-screen bg-gray-950 flex flex-col items-center px-4 pt-20">
       <Header />
 
-      <h1 className="text-3xl mt-4 font-bold text-white mb-6">
+      <h1 className="text-4xl font-bold text-white mb-8 text-center">
         Quizzes Pendentes
       </h1>
 
       {quizzes.length === 0 ? (
-        <p className="text-white text-center">Nenhum quiz pendente.</p>
+        <p className="text-gray-300 text-center text-lg">
+          Nenhum quiz pendente no momento.
+        </p>
       ) : (
-<div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 justify-items-center">
+        <div className="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
           {quizzes.map((quiz) => (
             <div
               key={quiz.id}
-              className="bg-gray-800 rounded-xl p-4 shadow-lg hover:bg-gray-700 transition flex flex-col"
+              className="bg-gray-800 border border-gray-700 rounded-2xl p-6 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between w-full h-56"
             >
-              <p className="text-white font-semibold">{quiz.quiz_name}</p>
-              <p className="text-gray-300 text-sm">
-                Enviado: {new Date(quiz.assigned_at).toLocaleDateString()}
-              </p>
-              {quiz.due_date && (
-                <p className="text-gray-300 text-sm">
-                  Prazo: {new Date(quiz.due_date).toLocaleDateString()}
-                </p>
-              )}
+              <div>
+                <h2 className="text-xl font-semibold text-white mb-2 text-center">
+                  {quiz.quiz_name}
+                </h2>
+                <div className="text-gray-300 text-sm text-center space-y-1">
+                  <p>
+                    <span className="text-gray-400">Enviado:</span>{" "}
+                    {new Date(quiz.assigned_at).toLocaleDateString()}
+                  </p>
+                  {quiz.due_date && (
+                    <p>
+                      <span className="text-gray-400">Prazo:</span>{" "}
+                      {new Date(quiz.due_date).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+              </div>
+
               <button
-                className="mt-2 px-4 py-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white font-semibold"
-                onClick={() => {
-                router.push(`/dashboard/student-quizzes/${params.id}/${quiz.id}`);
-                }}
+                onClick={() =>
+                  router.push(
+                    `/dashboard/student-quizzes/${params.id}/${quiz.id}`
+                  )
+                }
+                className="mt-4 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-all duration-200"
               >
                 Iniciar Quiz
               </button>

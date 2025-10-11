@@ -41,9 +41,8 @@ export default function StudentQuizPage() {
   const [acertos, setAcertos] = useState(0);
   const [erros, setErros] = useState(0);
   const [pontuacao, setPontuacao] = useState(0);
-const [isFinishing, setIsFinishing] = useState(false);
+  const [isFinishing, setIsFinishing] = useState(false);
 
-  // 🔹 Busca attempt
   useEffect(() => {
     if (!user?.id) return;
 
@@ -60,19 +59,26 @@ const [isFinishing, setIsFinishing] = useState(false);
         router.push("/dashboard");
         return;
       }
+
+      // Se já estiver concluído, mostra o resultado
+      if (data.status === "completed") {
+        setAttempt(data);
+        setShowResult(true);
+        setLoading(false);
+        return;
+      }
+
       setAttempt(data as QuizAttempt);
     };
 
     fetchAttempt();
   }, [attemptId, user, router]);
 
-  // 🔹 Busca quiz e perguntas atribuídas ao attempt
   useEffect(() => {
-    if (!attempt) return;
+    if (!attempt || perguntas.length > 0) return; // evita recarregar as perguntas
 
     const fetchQuizAndPerguntas = async () => {
       try {
-        // Busca quiz
         const { data: quizData, error: quizError } = await supabase
           .from("Quiz")
           .select("*")
@@ -102,12 +108,11 @@ const [isFinishing, setIsFinishing] = useState(false);
           `)
           .eq("quiz_attempt_id", attempt.id);
 
-        if (perguntasError || !perguntasData) throw perguntasError || new Error("Erro ao buscar perguntas");
+        if (perguntasError || !perguntasData)
+          throw perguntasError || new Error("Erro ao buscar perguntas");
 
-        // Mapeia para o formato Pergunta[]
         const perguntasDoAttempt = perguntasData.map((q: any) => q.pergunta);
         setPerguntas(perguntasDoAttempt);
-
         setLoading(false);
       } catch (err) {
         console.error("Erro ao carregar quiz e perguntas:", err);
@@ -122,7 +127,8 @@ const [isFinishing, setIsFinishing] = useState(false);
     if (selected !== null) return;
 
     setSelected(idx);
-    if (idx === perguntas[currentQuestion].correta) setAcertos((p) => p + 1);
+    if (idx === perguntas[currentQuestion].correta)
+      setAcertos((p) => p + 1);
     else setErros((p) => p + 1);
   };
 
@@ -132,47 +138,48 @@ const [isFinishing, setIsFinishing] = useState(false);
     } else {
       setCurrentQuestion((q) => q + 1);
       setSelected(null);
+      console.log("Avançou para a pergunta:", currentQuestion + 2);
     }
   };
 
   const handleFinish = async () => {
-  if (isFinishing || !quiz || !user?.id || !attempt) return;
-  setIsFinishing(true); // impede cliques repetidos
+    if (isFinishing || !quiz || !user?.id || !attempt) return;
+    setIsFinishing(true);
 
-  const calcPontuacao = Math.round((acertos / perguntas.length) * 100);
-  setPontuacao(calcPontuacao);
+    const calcPontuacao = Math.round((acertos / perguntas.length) * 100);
+    setPontuacao(calcPontuacao);
 
-  try {
-    // Salva resultado do quiz
-    const { error } = await supabase.from("QuizResultado").insert([{
-      quiz_id: attempt.quiz_id,
-      user_id: user.auth_id,
-      username: user.username,
-      acertos,
-      erros,
-      pontuacao: calcPontuacao,
-      created_at: new Date().toISOString()
-    }]);
-    if (error) console.error("Erro ao salvar resultado:", error);
+    try {
+      const { error } = await supabase.from("QuizResultado").insert([
+        {
+          quiz_id: attempt.quiz_id,
+          user_id: user.auth_id,
+          username: user.username,
+          acertos,
+          erros,
+          pontuacao: calcPontuacao,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+      if (error) console.error("Erro ao salvar resultado:", error);
 
-    // Atualiza status do attempt
-    if (attempt.status !== "completed") {
-      const { error: attemptError } = await supabase
-        .from("quizattempts")
-        .update({ status: "completed" })
-        .eq("id", attempt.id);
-      if (attemptError) console.error("Erro ao marcar quiz como completo:", attemptError);
-      else setAttempt({ ...attempt, status: "completed" });
+      if (attempt.status !== "completed") {
+        const { error: attemptError } = await supabase
+          .from("quizattempts")
+          .update({ status: "completed" })
+          .eq("id", attempt.id);
+        if (attemptError)
+          console.error("Erro ao marcar quiz como completo:", attemptError);
+        else setAttempt({ ...attempt, status: "completed" });
+      }
+    } catch (err) {
+      console.error("Erro inesperado ao finalizar quiz:", err);
     }
-  } catch (err) {
-    console.error("Erro inesperado ao finalizar quiz:", err);
-  }
 
-  setShowResult(true);
-  setIsFinishing(false); 
-};
+    setShowResult(true);
+    setIsFinishing(false);
+  };
 
-  
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white bg-gray-900">
@@ -199,13 +206,15 @@ const [isFinishing, setIsFinishing] = useState(false);
         <div className="bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
           <h1 className="text-3xl font-bold mb-6">{quiz.titulo}</h1>
           <p className="text-lg mb-2">
-            Acertos: <span className="font-semibold text-green-400">{acertos}</span>
+            Acertos:{" "}
+            <span className="font-semibold text-green-400">{acertos}</span>
           </p>
           <p className="text-lg mb-2">
             Erros: <span className="font-semibold text-red-400">{erros}</span>
           </p>
           <p className="text-lg mb-6">
-            Pontuação: <span className="font-semibold text-blue-400">{pontuacao}%</span>
+            Pontuação:{" "}
+            <span className="font-semibold text-blue-400">{pontuacao}%</span>
           </p>
           <button
             onClick={() => router.push("/dashboard")}
@@ -223,7 +232,10 @@ const [isFinishing, setIsFinishing] = useState(false);
   return (
     <div className="min-h-screen flex flex-col bg-gray-900 text-white items-center justify-center pt-20 px-4">
       <Header />
-      <div className="bg-gray-800 rounded-xl p-6 shadow-lg max-w-2xl w-full mx-auto">
+      <div
+        key={pergunta.id}
+        className="bg-gray-800 rounded-xl p-6 shadow-lg max-w-2xl w-full mx-auto"
+      >
         <h2 className="text-2xl font-bold mb-4 text-center">{quiz.titulo}</h2>
         <p className="mb-4 text-center">
           Pergunta {currentQuestion + 1} de {perguntas.length}
@@ -249,16 +261,21 @@ const [isFinishing, setIsFinishing] = useState(false);
           ))}
         </div>
         {selected !== null && (
-        <button
-  onClick={handleNext}
-  disabled={isFinishing}
-  className={`mt-4 px-6 py-3 rounded-full font-semibold w-full ${
-    isFinishing ? "bg-gray-600 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600 text-white"
-  }`}
->
-  {isFinishing ? "Finalizando..." : currentQuestion + 1 === perguntas.length ? "Finalizar Quiz" : "Próxima"}
-</button>
-
+          <button
+            onClick={handleNext}
+            disabled={isFinishing}
+            className={`mt-4 px-6 py-3 rounded-full font-semibold w-full ${
+              isFinishing
+                ? "bg-gray-600 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600 text-white"
+            }`}
+          >
+            {isFinishing
+              ? "Finalizando..."
+              : currentQuestion + 1 === perguntas.length
+              ? "Finalizar Quiz"
+              : "Próxima"}
+          </button>
         )}
       </div>
     </div>

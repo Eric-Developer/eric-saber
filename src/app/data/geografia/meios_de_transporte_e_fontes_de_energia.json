@@ -1,0 +1,89 @@
+[
+  {
+    "quiz": {
+      "id": 2,
+      "titulo": "Meios de Transporte e Fontes de Energia",
+      "tema": "Geografia",
+      "materia": "Transporte e Energia",
+      "anoestudo": "4º ano",
+      "tags": ["geografia", "transporte", "energia", "meio ambiente"]
+    },
+    "perguntas": [
+      {
+        "quiz_id": 2,
+        "texto": "Quais meios de transporte ajudam a atravessar rios e mares?",
+        "alternativas": ["Carro e moto", "Avião e helicóptero", "Barco, navio e canoa", "Trem e metrô"],
+        "correta": 2
+      },
+      {
+        "quiz_id": 2,
+        "texto": "Há quanto tempo o automóvel foi inventado?",
+        "alternativas": ["Há cerca de 50 anos", "Há cerca de 200 anos", "Há 500 anos", "Há 1000 anos"],
+        "correta": 1
+      },
+      {
+        "quiz_id": 2,
+        "texto": "Cite três produtos feitos com petróleo.",
+        "alternativas": ["Gasolina, plástico e óleo diesel", "Água, sal e areia", "Madeira, ferro e vidro", "Trigo, arroz e milho"],
+        "correta": 0
+      },
+      {
+        "quiz_id": 2,
+        "texto": "Qual é a principal fonte de energia elétrica no Brasil?",
+        "alternativas": ["O vento", "O sol", "A água dos rios", "O carvão"],
+        "correta": 2
+      },
+      {
+        "quiz_id": 2,
+        "texto": "O que é energia limpa?",
+        "alternativas": [
+          "É a energia que não polui o meio ambiente",
+          "É a energia que vem do petróleo",
+          "É a energia que usa carvão",
+          "É a energia que vem dos carros"
+        ],
+        "correta": 0
+      },
+      {
+        "quiz_id": 2,
+        "texto": "Como se ligava o carro antigamente?",
+        "alternativas": ["Com a chave", "Com uma manivela", "Com o pedal", "Com o controle remoto"],
+        "correta": 1
+      },
+      {
+        "quiz_id": 2,
+        "texto": "O que Karl Benz inventou e como isso ajudou?",
+        "alternativas": [
+          "Inventou o avião, ajudando nas viagens",
+          "Inventou o primeiro carro, ajudando a criar outros meios de transporte",
+          "Inventou o trem, ajudando no transporte de cargas",
+          "Inventou o navio, ajudando nas travessias"
+        ],
+        "correta": 1
+      },
+      {
+        "quiz_id": 2,
+        "texto": "Por que o trem a vapor era chamado de 'Maria-Fumaça'?",
+        "alternativas": ["Porque andava devagar", "Porque soltava muita fumaça", "Porque fazia barulho", "Porque levava passageiros"],
+        "correta": 1
+      },
+      {
+        "quiz_id": 2,
+        "texto": "Como os trens modernos são diferentes dos antigos?",
+        "alternativas": [
+          "São mais lentos e poluem mais",
+          "São mais rápidos e poluem menos",
+          "São menores e mais barulhentos",
+          "São movidos a carvão"
+        ],
+        "correta": 1
+      },
+      {
+        "quiz_id": 2,
+        "texto": "Antes das locomotivas, como os vagões eram puxados?",
+        "alternativas": ["Por automóveis", "Por tratores", "Por animais de tração", "Por pessoas"],
+        "correta": 2
+      }
+    ]
+  }
+]
