@@ -68,3 +68,28 @@ export interface StudentProgress {
   email?: string;
   quizzesTaken: QuizProgress[];
 }
+
+export interface UserData {
+  id?: string;
+  auth_id: string;
+  username?: string;
+  avatar_url?: string;
+  type?: "teacher" | "student" | "admin"; 
+}
+
+export interface Activity {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  subject?: string;
+  creator_id: string;
+  class_id: string;
+}
+
+export interface Resposta {
+  id: string;
+  autor_id: string;
+  texto: string;
+  tipo: string;
+}
